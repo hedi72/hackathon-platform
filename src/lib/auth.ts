@@ -27,8 +27,7 @@ declare module 'next-auth/adapters' {
 }
 
 export const authOptions: NextAuthOptions = {
-  // Temporairement désactivé pour tester GitHub
-  // adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     // Only add GitHub provider if credentials are available
@@ -109,29 +108,6 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       console.log('🔐 SignIn callback:', { provider: account?.provider, email: user?.email });
-      
-      // Pour GitHub, créer l'utilisateur s'il n'existe pas
-      if (account?.provider === 'github' && user?.email) {
-        try {
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email }
-          })
-          
-          if (!existingUser) {
-            await prisma.user.create({
-              data: {
-                email: user.email,
-                name: user.name || user.email.split('@')[0],
-                role: 'USER',
-                password: '', // Pas de mot de passe pour les utilisateurs GitHub
-              }
-            })
-          }
-        } catch (error) {
-          console.error('Error creating GitHub user:', error)
-        }
-      }
-      
       return true;
     },
     jwt: async ({ user, token, account }) => {

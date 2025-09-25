@@ -31,12 +31,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    console.log('📊 Dashboard useEffect:', { isLoading, isAuthenticated, user });
+    
+    // Ne rediriger que si on est sûr que l'utilisateur n'est pas authentifié
     if (!isLoading && !isAuthenticated) {
+      console.log('🔒 Dashboard: User not authenticated, redirecting to signin');
       router.push('/auth/signin')
       return
     }
 
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
+      console.log('✅ Dashboard: User authenticated, loading dashboard data');
       // In a real app, this would fetch from API
       // For demo, using mock data
       setTimeout(() => {
