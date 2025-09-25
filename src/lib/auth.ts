@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
             name: profile.name || profile.login,
             email: profile.email,
             image: profile.avatar_url,
-            role: 'user', // default role for new GitHub users
+            role: 'USER', // default role for new GitHub users using enum value
           }
         },
       })
@@ -101,11 +101,39 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     session: async ({ session, token }) => {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.sub
-        session.user.role = typeof token.role === 'string' ? token.role : undefined
+        session.user.role = typeof token.role === 'string' ? token.role : 'USER'
       }
       return session
+    },
+    async signIn({ user, account, profile }) {
+      try {
+        // For GitHub provider, ensure user has a role
+        if (account?.provider === 'github') {
+          // Check if user exists in database
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email! }
+          })
+          
+          // If user exists but signed up with credentials, link the accounts
+          if (existingUser && !existingUser.password) {
+            // Update existing user with GitHub info if needed
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: {
+                name: user.name || existingUser.name,
+                image: user.image || existingUser.image,
+              }
+            })
+          }
+        }
+        
+        return true
+      } catch (error) {
+        console.error('SignIn callback error:', error)
+        return false
+      }
     },
   },
   pages: {

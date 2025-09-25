@@ -67,20 +67,34 @@ export default function SignInPage() {
   const handleGithubSignIn = async () => {
     // Vérifier si GitHub est configuré
     if (!isGithubEnabled) {
-      toast.error('GitHub authentication is not configured. Please use email/password.')
+      toast.error('GitHub authentication is not configured. Please contact the administrator or use email/password.')
       return
     }
     
     setGithubLoading(true)
     try {
-      // Use redirect: true for faster server-side redirection
-      await signIn('github', { 
+      const result = await signIn('github', { 
         callbackUrl: '/dashboard',
-        redirect: true 
+        redirect: false // Change to false to handle errors properly
       })
+      
+      if (result?.error) {
+        console.error('GitHub signin error:', result.error)
+        if (result.error === 'OAuthCallback') {
+          toast.error('GitHub authentication failed. Please check your configuration or try again.')
+        } else if (result.error === 'AccessDenied') {
+          toast.error('Access denied. Please make sure your email is public on GitHub.')
+        } else {
+          toast.error('Failed to sign in with GitHub. Please try again or use email/password.')
+        }
+      } else if (result?.ok) {
+        toast.success('Welcome! Redirecting to dashboard...')
+        router.push('/dashboard')
+      }
     } catch (error) {
       console.error('GitHub signin error:', error)
-      toast.error('Failed to sign in with GitHub. Please try again.')
+      toast.error('An unexpected error occurred. Please try again.')
+    } finally {
       setGithubLoading(false)
     }
   }
