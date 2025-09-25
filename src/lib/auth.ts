@@ -16,6 +16,7 @@ declare module 'next-auth' {
       role?: string
       email?: string
       name?: string
+      image?: string
     }
   }
 }
@@ -97,6 +98,7 @@ export const authOptions: NextAuthOptions = {
     jwt: async ({ user, token }) => {
       if (user) {
         token.role = user.role
+        token.picture = user.image // Store image in token
       }
       return token
     },
@@ -104,26 +106,26 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.id = token.sub
         session.user.role = typeof token.role === 'string' ? token.role : 'USER'
+        session.user.image = typeof token.picture === 'string' ? token.picture : undefined
       }
       return session
     },
     async signIn({ user, account, profile }) {
       try {
-        // For GitHub provider, ensure user has a role
-        if (account?.provider === 'github') {
+        // For GitHub provider, update user info including avatar
+        if (account?.provider === 'github' && user.email) {
           // Check if user exists in database
           const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! }
+            where: { email: user.email }
           })
           
-          // If user exists but signed up with credentials, link the accounts
-          if (existingUser && !existingUser.password) {
-            // Update existing user with GitHub info if needed
+          // If user exists, update their GitHub info (name and avatar)
+          if (existingUser) {
             await prisma.user.update({
               where: { id: existingUser.id },
               data: {
                 name: user.name || existingUser.name,
-                image: user.image || existingUser.image,
+                image: user.image, // Always update avatar from GitHub
               }
             })
           }

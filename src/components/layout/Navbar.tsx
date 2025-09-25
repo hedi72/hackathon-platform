@@ -86,7 +86,7 @@ export function Navbar() {
                     <DropdownMenu>
                       <DropdownMenuTrigger>
                         <Avatar className="w-10 h-10 cursor-pointer hover:ring-4 hover:ring-yellow-400/50 transition-all duration-300">
-                          <AvatarImage src={''} alt={user?.name || 'User'} />
+                          <AvatarImage src={user?.image || ''} alt={user?.name || 'User'} />
                           <AvatarFallback className="bg-yellow-400 text-purple-600 font-bold">
                             {user?.name?.charAt(0) || 'U'}
                           </AvatarFallback>
