@@ -95,13 +95,29 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    jwt: async ({ user, token }) => {
+    async signIn({ user, account, profile }) {
+      console.log('🔐 SignIn callback triggered:', { 
+        userEmail: user?.email, 
+        accountProvider: account?.provider 
+      });
+      return true;
+    },
+    jwt: async ({ user, token, account }) => {
+      console.log('🎫 JWT callback triggered:', { 
+        hasUser: !!user, 
+        tokenSub: token.sub,
+        accountProvider: account?.provider 
+      });
       if (user) {
         token.role = user.role
       }
       return token
     },
     session: async ({ session, token }) => {
+      console.log('📋 Session callback triggered:', { 
+        sessionUserEmail: session.user?.email,
+        tokenSub: token.sub 
+      });
       if (token) {
         session.user.id = token.sub
         session.user.role = typeof token.role === 'string' ? token.role : undefined
@@ -109,8 +125,10 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     redirect({ url, baseUrl }) {
+      console.log('🔄 Redirect callback:', { url, baseUrl });
       // Redirection vers dashboard après connexion GitHub
-      if (url === baseUrl || url.startsWith(baseUrl + '/')) {
+      if (url === baseUrl || url.startsWith(baseUrl + '/auth')) {
+        console.log('🏠 Redirecting to dashboard');
         return `${baseUrl}/dashboard`
       }
       return url.startsWith('/') ? `${baseUrl}${url}` : url
@@ -118,5 +136,17 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin',
+  },
+  debug: true,
+  logger: {
+    error(code, metadata) {
+      console.error('🚨 NextAuth Error:', code, metadata);
+    },
+    warn(code) {
+      console.warn('⚠️ NextAuth Warning:', code);
+    },
+    debug(code, metadata) {
+      console.log('🔍 NextAuth Debug:', code, metadata);
+    },
   },
 }
