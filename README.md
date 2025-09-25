@@ -1,6 +1,11 @@
 # 🚀 Hackathon Platform
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/hedi72/hackathon-platform)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-brightgreen)](https://hackathon-platform-sigma.vercel.app/)
+
 A modern, full-stack web application built with Next.js for hosting and managing hackathons. Connect with developers, form teams, and participate in exciting coding competitions.
+
+🌐 **Live Demo**: [https://hackathon-platform-sigma.vercel.app/](https://hackathon-platform-sigma.vercel.app/)
 
 ![Hackathon Platform](./public/images/generated-image%20-%202025-09-24T170711.890.png)
 
@@ -103,6 +108,8 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
+> **🌟 Want to see it in action?** Check out the live demo at [https://hackathon-platform-sigma.vercel.app/](https://hackathon-platform-sigma.vercel.app/)
+
 ## 📁 Project Structure
 
 ```
@@ -167,11 +174,21 @@ The application uses **MongoDB** with **Prisma** ORM. Key models include:
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
+### Vercel (Recommended) ✅ **DEPLOYED**
+🌐 **Current Deployment**: [https://hackathon-platform-sigma.vercel.app/](https://hackathon-platform-sigma.vercel.app/)
+
+To deploy your own version:
 1. Push your code to GitHub
 2. Connect your repository to Vercel
 3. Add environment variables in Vercel dashboard
 4. Deploy automatically
+
+#### Required Environment Variables for Vercel:
+```bash
+DATABASE_URL="your-mongodb-connection-string"
+NEXTAUTH_URL="https://your-app.vercel.app"
+NEXTAUTH_SECRET="your-secret-key"
+```
 
 ### Other Platforms
 The application can be deployed on any platform that supports Next.js:
@@ -179,6 +196,126 @@ The application can be deployed on any platform that supports Next.js:
 - Railway
 - Heroku
 - DigitalOcean App Platform
+
+## 🐛 Troubleshooting
+
+### Common Deployment Issues
+
+#### 1. 500 Internal Server Error on `/api/auth/signup`
+**Problem**: Database connection or environment variables not configured properly.
+
+**Immediate Debugging Steps**:
+1. **Check Health Endpoints** (after redeployment):
+   - 🏥 Basic health: `https://hackathon-platform-sigma.vercel.app/api/health`
+   - 🔍 Database test: `https://hackathon-platform-sigma.vercel.app/api/test-db`
+
+2. **Check Vercel Function Logs**:
+   - Go to Vercel Dashboard → Your Project → Functions tab
+   - Look for detailed error logs with 🔍 emojis
+
+**Solutions**:
+- ✅ Verify `DATABASE_URL` is set in Vercel environment variables
+- ✅ Ensure MongoDB database is accessible from Vercel's servers  
+- ✅ Use MongoDB Atlas (recommended for production)
+- ✅ Whitelist `0.0.0.0/0` in MongoDB Atlas Network Access (temporarily for testing)
+- ✅ Run `npx prisma generate` and `npx prisma db push` after schema changes
+- ✅ Check detailed logs in Vercel dashboard
+
+**Example working DATABASE_URL formats**:
+```bash
+# MongoDB Atlas
+DATABASE_URL="mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/hackathon-platform?retryWrites=true&w=majority"
+
+# Local MongoDB (development only)
+DATABASE_URL="mongodb://localhost:27017/hackathon-platform"
+```
+
+#### 2. Database Connection Errors
+**Problem**: MongoDB connection string or network issues.
+
+**Solutions**:
+- ✅ Use MongoDB Atlas for cloud deployment (recommended)
+- ✅ Whitelist Vercel IP ranges in MongoDB Atlas
+- ✅ Ensure connection string includes database name
+- ✅ Test connection string locally first
+
+#### 3. NextAuth Configuration Issues
+**Problem**: NextAuth session errors and authentication problems.
+
+**Common Errors**:
+- `CLIENT_FETCH_ERROR`: Server configuration issue
+- 500 errors on `/api/auth/session`
+- 500 errors on `/api/auth/_log`
+
+**Solutions**:
+- ✅ Ensure all required environment variables are set:
+  - `NEXTAUTH_URL="https://hackathon-platform-sigma.vercel.app"`
+  - `NEXTAUTH_SECRET="random-secret-string-32-chars-min"`
+- ✅ Test NextAuth config: `https://hackathon-platform-sigma.vercel.app/api/test-auth`
+- ✅ Remove GitHub provider if `GITHUB_ID` and `GITHUB_SECRET` are not set
+- ✅ Verify Prisma adapter is working with database
+
+#### 4. Missing API Routes (404 Errors)
+**Problem**: Routes like `/projects` returning 404 errors.
+
+**Solutions**:
+- ✅ Verify all API routes exist in `/app/api/` directory
+- ✅ Test projects API: `https://hackathon-platform-sigma.vercel.app/api/projects`
+- ✅ Check for typos in route names and file structure
+- ✅ Ensure proper file naming: `route.ts` not `index.ts`
+
+#### 4. Build Errors
+**Problem**: TypeScript or dependency issues during build.
+
+**Solutions**:
+- ✅ Run `npm run build` locally to test
+- ✅ Ensure all dependencies are in `package.json`
+- ✅ Check TypeScript configuration
+- ✅ Verify Prisma client is generated
+
+### Environment Variables Checklist
+- [ ] `DATABASE_URL` - MongoDB connection string
+- [ ] `NEXTAUTH_URL` - Your production domain
+- [ ] `NEXTAUTH_SECRET` - Random secret string
+- [ ] OAuth provider credentials (if using)
+
+### Debugging Steps
+1. **Check Health Endpoints** (after redeployment):
+   ```bash
+   # Basic configuration check
+   curl https://hackathon-platform-sigma.vercel.app/api/health
+   
+   # Database connection test
+   curl https://hackathon-platform-sigma.vercel.app/api/test-db
+   
+   # NextAuth configuration test
+   curl https://hackathon-platform-sigma.vercel.app/api/test-auth
+   
+   # Projects API test
+   curl https://hackathon-platform-sigma.vercel.app/api/projects
+   ```
+
+2. **Check Vercel Function Logs**:
+   - Go to Vercel dashboard → Your project → Functions tab
+   - Look for error messages with 🔍, ❌, and ✅ emojis for easy identification
+
+3. **Test Database Connection**:
+   ```bash
+   npx prisma db push
+   npx prisma studio
+   ```
+
+4. **Local Environment Test**:
+   ```bash
+   npm run build
+   npm start
+   ```
+
+5. **Prisma Issues**:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
 ## 📝 Available Scripts
 
