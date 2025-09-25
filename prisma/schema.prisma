@@ -1,0 +1,167 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String    @unique
+  password      String
+  emailVerified DateTime?
+  image         String?
+  bio           String?
+  skills        String[]
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  organizedEvents  Event[]   @relation("EventOrganizer")
+  participations   EventParticipant[]
+  projects         Project[]
+  votes            Vote[]
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Event {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  imageUrl    String?
+  startDate   DateTime
+  endDate     DateTime
+  location    String?
+  isVirtual   Boolean     @default(false)
+  maxTeamSize Int         @default(5)
+  prizePool   Int?
+  status      EventStatus @default(UPCOMING)
+  rules       String?
+  requirements String?
+  organizerId String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  organizer     User               @relation("EventOrganizer", fields: [organizerId], references: [id])
+  participants  EventParticipant[]
+  projects      Project[]
+  categories    EventCategory[]
+}
+
+model EventCategory {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventParticipant {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  userId  String
+  eventId String
+  joinedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Project {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  imageUrl    String?
+  repoUrl     String?
+  demoUrl     String?
+  techStack   String[]
+  eventId     String
+  teamLeadId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  event     Event           @relation(fields: [eventId], references: [id])
+  teamLead  User            @relation(fields: [teamLeadId], references: [id])
+  members   ProjectMember[]
+  votes     Vote[]
+}
+
+model ProjectMember {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  projectId String
+  userId    String
+  role      String @default("Developer")
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@unique([projectId, userId])
+}
+
+model Vote {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  projectId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@unique([userId, projectId])
+}
+
+enum UserRole {
+  USER
+  ORGANIZER
+  ADMIN
+}
+
+enum EventStatus {
+  DRAFT
+  UPCOMING
+  ACTIVE
+  ENDED
+  CANCELLED
+}
