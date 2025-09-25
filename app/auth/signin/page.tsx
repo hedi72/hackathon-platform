@@ -73,16 +73,11 @@ export default function SignInPage() {
     
     setGithubLoading(true)
     try {
-      // Use redirect: false to handle redirection manually
-      const result = await signIn('github', { 
-        callbackUrl: '/dashboard',
-        redirect: false 
+      // Use redirect: true for automatic redirection
+      await signIn('github', { 
+        callbackUrl: '/dashboard'
       })
-      
-      if (result?.url) {
-        // Redirect manually after successful signin
-        window.location.href = result.url
-      }
+      // Note: pas besoin de setGithubLoading(false) ici car la page va se recharger
     } catch (error) {
       console.error('GitHub signin error:', error)
       toast.error('Failed to sign in with GitHub. Please try again.')

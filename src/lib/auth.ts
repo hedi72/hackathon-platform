@@ -126,6 +126,19 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
+    async redirect({ url, baseUrl }) {
+      console.log('🔄 Redirect callback:', { url, baseUrl });
+      // Si c'est une URL relative, construire l'URL complète
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`
+      }
+      // Si l'URL contient déjà le baseUrl, la retourner telle quelle
+      if (url.startsWith(baseUrl)) {
+        return url
+      }
+      // Par défaut, rediriger vers le dashboard
+      return `${baseUrl}/dashboard`
+    },
   },
   pages: {
     signIn: '/auth/signin',
