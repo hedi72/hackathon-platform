@@ -28,6 +28,7 @@ declare module 'next-auth/adapters' {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     // Only add GitHub provider if credentials are available
     ...(process.env.GITHUB_ID && process.env.GITHUB_SECRET ? [
@@ -46,6 +47,7 @@ export const authOptions: NextAuthOptions = {
         try {
           console.log('🔐 NextAuth: Attempting credentials login');
           console.log('🔐 NextAuth: Environment check - DATABASE_URL exists:', !!process.env.DATABASE_URL);
+          console.log('🔐 NextAuth: Environment check - NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
           
           if (!credentials?.email || !credentials?.password) {
             console.log('❌ NextAuth: Missing credentials');
@@ -144,6 +146,8 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
   },
   debug: process.env.NODE_ENV === 'development',
+  // Add explicit URL for Vercel deployment
+  ...(process.env.NEXTAUTH_URL ? { url: process.env.NEXTAUTH_URL } : {}),
   logger: {
     error(code, metadata) {
       console.error('🚨 NextAuth Error:', code, metadata);
