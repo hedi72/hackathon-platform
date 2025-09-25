@@ -27,7 +27,8 @@ declare module 'next-auth/adapters' {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  // Temporairement désactivé pour tester GitHub
+  // adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     // Only add GitHub provider if credentials are available
@@ -107,6 +108,13 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
+    redirect({ url, baseUrl }) {
+      // Redirection vers dashboard après connexion GitHub
+      if (url === baseUrl || url.startsWith(baseUrl + '/')) {
+        return `${baseUrl}/dashboard`
+      }
+      return url.startsWith('/') ? `${baseUrl}${url}` : url
+    }
   },
   pages: {
     signIn: '/auth/signin',
