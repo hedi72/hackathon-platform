@@ -293,11 +293,17 @@ DATABASE_URL="mongodb://localhost:27017/hackathon-platform"
    
    # Projects API test
    curl https://hackathon-platform-sigma.vercel.app/api/projects
+   
+   # Test signin process (POST with email/password)
+   curl -X POST https://hackathon-platform-sigma.vercel.app/api/test-signin \
+     -H "Content-Type: application/json" \
+     -d '{"email":"test@example.com","password":"testpassword"}'
    ```
 
 2. **Check Vercel Function Logs**:
    - Go to Vercel dashboard → Your project → Functions tab
    - Look for error messages with 🔍, ❌, and ✅ emojis for easy identification
+   - Pay attention to NextAuth specific logs: 🔐, 🎫, 📋
 
 3. **Test Database Connection**:
    ```bash

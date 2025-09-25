@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../src/lib/auth';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { prisma } from '../../../src/lib/prisma';
 
 export async function GET() {
   try {
@@ -19,11 +21,45 @@ export async function GET() {
         nodeEnv: process.env.NODE_ENV,
         hasGithubId: !!process.env.GITHUB_ID,
         hasGithubSecret: !!process.env.GITHUB_SECRET,
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+      },
+      database: {
+        connection: 'not_tested',
+        adapter: 'not_tested'
       }
     };
 
+    // Test database connection for adapter
+    try {
+      console.log('🔌 Testing database connection for adapter...');
+      await prisma.$connect();
+      console.log('✅ Database connected for adapter');
+      testResult.database.connection = 'success';
+      
+      // Test adapter functionality
+      console.log('🔧 Testing Prisma adapter...');
+      const adapter = PrismaAdapter(prisma);
+      console.log('✅ Prisma adapter created successfully');
+      testResult.database.adapter = 'created';
+      
+      // Test basic adapter methods
+      if (adapter.getUser) {
+        console.log('✅ Adapter getUser method exists');
+        testResult.database.adapterMethods = 'available';
+      }
+      
+    } catch (dbError) {
+      console.error('❌ Database/Adapter test failed:', dbError);
+      testResult.database = {
+        connection: 'failed',
+        adapter: 'failed',
+        error: dbError instanceof Error ? dbError.message : 'Unknown error'
+      };
+    }
+
     // Test getting session (this might fail if there are issues)
     try {
+      console.log('📋 Testing session retrieval...');
       const session = await getServerSession(authOptions);
       testResult.session = {
         exists: !!session,
@@ -69,5 +105,12 @@ export async function GET() {
       },
       { status: 500 }
     );
+  } finally {
+    try {
+      await prisma.$disconnect();
+      console.log('🔌 Database disconnected from auth test');
+    } catch (disconnectError) {
+      console.error('⚠️ Error disconnecting from database:', disconnectError);
+    }
   }
 }

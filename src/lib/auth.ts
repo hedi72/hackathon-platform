@@ -45,6 +45,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         try {
           console.log('🔐 NextAuth: Attempting credentials login');
+          console.log('🔐 NextAuth: Environment check - DATABASE_URL exists:', !!process.env.DATABASE_URL);
           
           if (!credentials?.email || !credentials?.password) {
             console.log('❌ NextAuth: Missing credentials');
@@ -52,6 +53,16 @@ export const authOptions: NextAuthOptions = {
           }
 
           console.log('🔍 NextAuth: Looking for user:', credentials.email);
+          
+          // Test database connection first
+          try {
+            await prisma.$connect();
+            console.log('✅ NextAuth: Database connected for auth');
+          } catch (dbError) {
+            console.error('❌ NextAuth: Database connection failed in authorize:', dbError);
+            throw new Error(`Database connection failed during auth: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`);
+          }
+          
           const user = await prisma.user.findUnique({
             where: {
               email: credentials.email
@@ -60,6 +71,7 @@ export const authOptions: NextAuthOptions = {
 
           if (!user) {
             console.log('❌ NextAuth: User not found');
+            await prisma.$disconnect();
             return null
           }
 
@@ -71,10 +83,13 @@ export const authOptions: NextAuthOptions = {
 
           if (!isPasswordValid) {
             console.log('❌ NextAuth: Invalid password');
+            await prisma.$disconnect();
             return null
           }
 
           console.log('✅ NextAuth: Login successful for:', user.email);
+          await prisma.$disconnect();
+          
           return {
             id: user.id,
             email: user.email,
@@ -83,6 +98,11 @@ export const authOptions: NextAuthOptions = {
           }
         } catch (error) {
           console.error('💥 NextAuth authorize error:', error);
+          try {
+            await prisma.$disconnect();
+          } catch (disconnectError) {
+            console.error('⚠️ Error disconnecting in authorize error:', disconnectError);
+          }
           return null
         }
       }
@@ -93,17 +113,31 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     jwt: async ({ user, token }) => {
-      if (user) {
-        token.role = user.role
+      try {
+        console.log('🎫 NextAuth: JWT callback triggered');
+        if (user) {
+          console.log('✅ NextAuth: Adding user to token');
+          token.role = user.role
+        }
+        return token
+      } catch (error) {
+        console.error('❌ NextAuth: JWT callback error:', error);
+        return token
       }
-      return token
     },
     session: async ({ session, token }) => {
-      if (token) {
-        session.user.id = token.sub
-        session.user.role = typeof token.role === 'string' ? token.role : undefined
+      try {
+        console.log('📋 NextAuth: Session callback triggered');
+        if (token) {
+          session.user.id = token.sub
+          session.user.role = typeof token.role === 'string' ? token.role : undefined
+          console.log('✅ NextAuth: Session updated successfully');
+        }
+        return session
+      } catch (error) {
+        console.error('❌ NextAuth: Session callback error:', error);
+        return session
       }
-      return session
     },
   },
   pages: {
