@@ -4,9 +4,9 @@ Cette collection Postman contient tous les endpoints de votre plateforme de hack
 
 ## 📁 Fichiers inclus
 
-- `Hackathon-Platform-API.postman_collection.json` - Collection principale
+- `Hackathon-Platform-Complete.postman_collection.json` - Collection principale complète
+- `Local-Development.postman_environment.json` - Environnement de développement local
 - `Production.postman_environment.json` - Environnement de production
-- `Local.postman_environment.json` - Environnement local
 
 ## 🚀 Installation
 
@@ -14,21 +14,23 @@ Cette collection Postman contient tous les endpoints de votre plateforme de hack
 1. Ouvrir Postman
 2. **Import** → **Upload Files**
 3. Sélectionner les 3 fichiers JSON
+4. Ou glisser-déposer directement dans Postman
 
 ### 2. Configurer l'environnement
-- Choisir **"Production"** ou **"Local"** selon vos besoins
+- Choisir **"Local Development"** pour les tests locaux
+- Choisir **"Production"** pour tester l'environnement déployé
 - Les variables sont automatiquement configurées
 
 ## 📋 Endpoints disponibles
 
-### 🏥 **Health & Test**
+### 🏥 **Health & Monitoring**
 - `GET /api/health` - Vérifier l'état de l'application
 - `GET /api/test-connection` - Tester la connexion à la base de données
 
 ### 🔐 **Authentication**
 - `POST /api/auth/signup` - Créer un compte utilisateur
-- `GET /api/auth/session` - Récupérer la session active
 - `POST /api/auth/callback/credentials` - Connexion avec email/password
+- `GET /api/auth/session` - Récupérer la session active
 - `POST /api/auth/signout` - Déconnexion
 
 ### 🎯 **Events & Organization**
@@ -39,14 +41,111 @@ Cette collection Postman contient tous les endpoints de votre plateforme de hack
 - `GET /api/projects` - Récupérer tous les projets
 - `POST /api/projects` - Créer un nouveau projet
 
-### 📄 **Pages Static**
-- `GET /` - Page d'accueil
-- `GET /dashboard` - Tableau de bord (authentification requise)
-- `GET /events` - Page des événements
-- `GET /auth/signin` - Page de connexion
-- `GET /auth/signup` - Page d'inscription
+### 🧪 **Test Endpoints**
+- `GET /api/test-auth` - Tester le statut d'authentification
+- `GET /api/test-db` - Tester la connexion à la base de données
+- `GET /api/test-organize` - Tester les fonctionnalités d'organisation
+- `GET /api/test-signin` - Tester le processus de connexion
+- `GET /api/test-users` - Tester la gestion des utilisateurs
 
 ## 🔧 Variables d'environnement
+
+### Local Development
+```json
+{
+  "baseUrl": "http://localhost:3000",
+  "apiUrl": "http://localhost:3000/api",
+  "environment": "development",
+  "testUserEmail": "test@localhost.com",
+  "testUserPassword": "password123"
+}
+```
+
+### Production
+```json
+{
+  "baseUrl": "https://your-hackathon-platform.vercel.app",
+  "apiUrl": "https://your-hackathon-platform.vercel.app/api",
+  "environment": "production",
+  "testUserEmail": "demo@hackathon-platform.com",
+  "testUserPassword": "DemoPassword2025!"
+}
+```
+
+## 🔄 Workflows recommandés
+
+### 1. Test d'authentification complet
+1. **Health Check** - Vérifier que l'API fonctionne
+2. **Signup** - Créer un compte de test
+3. **Signin** - Se connecter avec les identifiants
+4. **Get Session** - Vérifier la session active
+5. **Test Auth Status** - Confirmer l'authentification
+
+### 2. Test de création d'événement
+1. **Signin** - Se connecter d'abord
+2. **Create Event** - Créer un nouvel événement
+3. **Get Events** - Vérifier que l'événement a été créé
+
+### 3. Test de gestion de projets
+1. **Signin** - Authentification
+2. **Create Project** - Créer un projet
+3. **Get All Projects** - Vérifier la liste des projets
+
+## 🔒 Authentification
+
+La collection utilise les cookies de session pour l'authentification. Après une connexion réussie, les requêtes suivantes utiliseront automatiquement la session.
+
+### Variables d'authentification
+- `testUserEmail` - Email par défaut pour les tests
+- `testUserPassword` - Mot de passe par défaut pour les tests
+
+## 📝 Scripts de test intégrés
+
+Chaque requête contient des scripts de test automatiques qui :
+- Vérifient les codes de statut HTTP
+- Extraient et sauvegardent les tokens d'authentification
+- Affichent des messages informatifs dans la console
+
+## 🐛 Débogage
+
+### Console Postman
+Ouvrez la console Postman (**View** → **Show Postman Console**) pour voir :
+- Les logs des requêtes
+- Les messages de debug
+- Les erreurs détaillées
+
+### Variables utiles pour le debug
+- `{{baseUrl}}` - URL de base de l'application
+- `{{environment}}` - Environnement actuel (dev/prod)
+
+## 🔄 Mise à jour de la collection
+
+Pour mettre à jour la collection :
+1. Ré-importer le fichier JSON
+2. Choisir **"Replace"** pour écraser l'ancienne version
+3. Vérifier que l'environnement est toujours sélectionné
+
+## 🆘 Problèmes courants
+
+### Erreur CORS
+- Vérifiez que l'URL de base est correcte
+- Assurez-vous que le serveur local fonctionne sur le port 3000
+
+### Authentification échouée
+- Vérifiez les identifiants dans les variables d'environnement
+- Créez d'abord un compte avec l'endpoint Signup
+- Vérifiez que les cookies sont activés dans Postman
+
+### Base de données inaccessible
+- Vérifiez que Prisma est configuré correctement
+- Testez avec l'endpoint `/api/test-connection`
+
+## 📞 Support
+
+Pour toute question ou problème :
+1. Vérifiez d'abord la console Postman
+2. Consultez les logs du serveur Next.js
+3. Testez les endpoints de santé en premier
 
 ### Production
 ```json

@@ -1,0 +1,355 @@
+{
+  "info": {
+    "name": "Hackathon Platform API - Complete Collection",
+    "description": "Collection complète pour tester toutes les APIs de la plateforme de hackathons",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 2,
+      "minor": 1,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "🏥 Health & Monitoring",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            },
+            "description": "Vérifie l'état de l'application"
+          }
+        },
+        {
+          "name": "Test Database Connection",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/test-connection",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "test-connection"]
+            },
+            "description": "Teste la connexion à la base de données Prisma"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Signup - Create Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const response = pm.response.json();",
+                  "  if (response.message) {",
+                  "    console.log('Account created successfully:', response.message);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signup"]
+            },
+            "description": "Créer un nouveau compte utilisateur"
+          }
+        },
+        {
+          "name": "Signin - Credentials Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const cookies = pm.response.headers.get('Set-Cookie');",
+                  "  if (cookies) {",
+                  "    console.log('Login successful, session cookie set');",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "test@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "password123",
+                  "type": "text"
+                },
+                {
+                  "key": "redirect",
+                  "value": "false",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/callback/credentials",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "callback", "credentials"]
+            },
+            "description": "Connexion avec email et mot de passe"
+          }
+        },
+        {
+          "name": "Get Session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/session",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "session"]
+            },
+            "description": "Récupérer la session utilisateur actuelle"
+          }
+        },
+        {
+          "name": "Signout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signout"]
+            },
+            "description": "Déconnexion de l'utilisateur"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎯 Events & Organization",
+      "item": [
+        {
+          "name": "Get Events (Organize)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/organize",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organize"]
+            },
+            "description": "Récupérer les événements organisés"
+          }
+        },
+        {
+          "name": "Create Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"AI Innovation Hackathon\",\n  \"description\": \"Un hackathon dédié à l'innovation en intelligence artificielle\",\n  \"startDate\": \"2025-03-15T09:00:00.000Z\",\n  \"endDate\": \"2025-03-17T18:00:00.000Z\",\n  \"location\": \"Paris, France\",\n  \"maxParticipants\": 100,\n  \"registrationDeadline\": \"2025-03-10T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/organize",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organize"]
+            },
+            "description": "Créer un nouvel événement/hackathon"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚀 Projects",
+      "item": [
+        {
+          "name": "Get All Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects"]
+            },
+            "description": "Récupérer tous les projets"
+          }
+        },
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"EcoTrack App\",\n  \"description\": \"Application mobile pour suivre et réduire son empreinte carbone\",\n  \"technologies\": [\"React Native\", \"Node.js\", \"PostgreSQL\"],\n  \"repositoryUrl\": \"https://github.com/user/ecotrack-app\",\n  \"demoUrl\": \"https://ecotrack-demo.vercel.app\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects"]
+            },
+            "description": "Créer un nouveau projet"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Test Endpoints",
+      "item": [
+        {
+          "name": "Test Auth Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/test-auth",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "test-auth"]
+            },
+            "description": "Tester le statut d'authentification"
+          }
+        },
+        {
+          "name": "Test Database",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/test-db",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "test-db"]
+            },
+            "description": "Tester la connexion à la base de données"
+          }
+        },
+        {
+          "name": "Test Organization Feature",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/test-organize",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "test-organize"]
+            },
+            "description": "Tester les fonctionnalités d'organisation"
+          }
+        },
+        {
+          "name": "Test Signin Flow",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/test-signin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "test-signin"]
+            },
+            "description": "Tester le processus de connexion"
+          }
+        },
+        {
+          "name": "Test Users Management",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/test-users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "test-users"]
+            },
+            "description": "Tester la gestion des utilisateurs"
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "inherit"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Script global avant chaque requête",
+          "console.log('🚀 Executing request to:', pm.request.url);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Script global après chaque requête",
+          "console.log('✅ Response status:', pm.response.status);"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}
