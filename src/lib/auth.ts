@@ -93,46 +93,39 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log('🔐 SignIn callback triggered:', { 
-        userEmail: user?.email, 
-        accountProvider: account?.provider 
-      });
+      console.log('🔐 SignIn callback:', { provider: account?.provider, email: user?.email });
       return true;
     },
     jwt: async ({ user, token, account }) => {
-      console.log('🎫 JWT callback triggered:', { 
-        hasUser: !!user, 
-        tokenSub: token.sub,
-        accountProvider: account?.provider 
-      });
       if (user) {
+        console.log('🎫 JWT callback: Creating token for', user.email);
         token.role = user.role
       }
       return token
     },
     session: async ({ session, token }) => {
-      console.log('📋 Session callback triggered:', { 
-        sessionUserEmail: session.user?.email,
-        tokenSub: token.sub 
-      });
       if (token) {
+        console.log('📋 Session callback: Creating session for', token.sub);
         session.user.id = token.sub
         session.user.role = typeof token.role === 'string' ? token.role : undefined
       }
       return session
     },
-    redirect({ url, baseUrl }) {
-      console.log('🔄 Redirect callback:', { url, baseUrl });
-      // Redirection vers dashboard après connexion GitHub
-      if (url === baseUrl || url.startsWith(baseUrl + '/auth')) {
-        console.log('🏠 Redirecting to dashboard');
-        return `${baseUrl}/dashboard`
-      }
-      return url.startsWith('/') ? `${baseUrl}${url}` : url
-    }
   },
   pages: {
     signIn: '/auth/signin',
