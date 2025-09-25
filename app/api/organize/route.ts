@@ -5,7 +5,9 @@ import { prisma } from '../../../src/lib/prisma';
 
 export async function GET(request: Request) {
   try {
-    console.log('📋 Organize API called at:', new Date().toISOString());
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📋 Organize API called at:', new Date().toISOString());
+    }
     
     const session = await getServerSession(authOptions);
     
@@ -19,12 +21,16 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const rsc = searchParams.get('_rsc');
     
-    console.log('🔍 Request params:', { rsc });
-    console.log('👤 Session user:', session.user);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Request params:', { rsc });
+      console.log('👤 Session user:', session.user);
+    }
 
     // Test database connection
     await prisma.$connect();
-    console.log('✅ Database connected for organize');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Database connected for organize');
+    }
 
     // Fetch events organized by the current user
     const organizedEvents = await prisma.event.findMany({
@@ -64,7 +70,9 @@ export async function GET(request: Request) {
       }
     });
 
-    console.log('✅ Returning organized events:', organizedEvents.length);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Returning organized events:', organizedEvents.length);
+    }
     
     return NextResponse.json({
       success: true,
@@ -87,7 +95,9 @@ export async function GET(request: Request) {
   } finally {
     try {
       await prisma.$disconnect();
-      console.log('🔌 Database disconnected from organize API');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔌 Database disconnected from organize API');
+      }
     } catch (disconnectError) {
       console.error('⚠️ Error disconnecting from database:', disconnectError);
     }

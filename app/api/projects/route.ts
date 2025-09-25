@@ -3,16 +3,22 @@ import { prisma } from '../../../src/lib/prisma';
 
 export async function GET(request: Request) {
   try {
-    console.log('📋 Projects API called at:', new Date().toISOString());
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📋 Projects API called at:', new Date().toISOString());
+    }
     
     const { searchParams } = new URL(request.url);
     const rsc = searchParams.get('_rsc');
     
-    console.log('🔍 Request params:', { rsc });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Request params:', { rsc });
+    }
 
     // Test database connection
     await prisma.$connect();
-    console.log('✅ Database connected for projects');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Database connected for projects');
+    }
 
     // For now, return mock projects data
     // In a real app, you would fetch from the database
@@ -35,7 +41,9 @@ export async function GET(request: Request) {
       }
     ];
 
-    console.log('✅ Returning projects data');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Returning projects data');
+    }
     
     return NextResponse.json({
       success: true,

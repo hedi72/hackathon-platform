@@ -45,21 +45,29 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          console.log('🔐 NextAuth: Attempting credentials login');
-          console.log('🔐 NextAuth: Environment check - DATABASE_URL exists:', !!process.env.DATABASE_URL);
-          console.log('🔐 NextAuth: Environment check - NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🔐 NextAuth: Attempting credentials login');
+            console.log('🔐 NextAuth: Environment check - DATABASE_URL exists:', !!process.env.DATABASE_URL);
+            console.log('🔐 NextAuth: Environment check - NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
+          }
           
           if (!credentials?.email || !credentials?.password) {
-            console.log('❌ NextAuth: Missing credentials');
+            if (process.env.NODE_ENV === 'development') {
+              console.log('❌ NextAuth: Missing credentials');
+            }
             return null
           }
 
-          console.log('🔍 NextAuth: Looking for user:', credentials.email);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🔍 NextAuth: Looking for user:', credentials.email);
+          }
           
           // Test database connection first
           try {
             await prisma.$connect();
-            console.log('✅ NextAuth: Database connected for auth');
+            if (process.env.NODE_ENV === 'development') {
+              console.log('✅ NextAuth: Database connected for auth');
+            }
           } catch (dbError) {
             console.error('❌ NextAuth: Database connection failed in authorize:', dbError);
             throw new Error(`Database connection failed during auth: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`);
@@ -72,24 +80,32 @@ export const authOptions: NextAuthOptions = {
           })
 
           if (!user) {
-            console.log('❌ NextAuth: User not found');
+            if (process.env.NODE_ENV === 'development') {
+              console.log('❌ NextAuth: User not found');
+            }
             await prisma.$disconnect();
             return null
           }
 
-          console.log('🔒 NextAuth: Verifying password');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🔒 NextAuth: Verifying password');
+          }
           const isPasswordValid = await bcrypt.compare(
             credentials.password,
             user.password || ''
           )
 
           if (!isPasswordValid) {
-            console.log('❌ NextAuth: Invalid password');
+            if (process.env.NODE_ENV === 'development') {
+              console.log('❌ NextAuth: Invalid password');
+            }
             await prisma.$disconnect();
             return null
           }
 
-          console.log('✅ NextAuth: Login successful for:', user.email);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ NextAuth: Login successful for:', user.email);
+          }
           await prisma.$disconnect();
           
           return {
@@ -116,9 +132,13 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     jwt: async ({ user, token }) => {
       try {
-        console.log('🎫 NextAuth: JWT callback triggered');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🎫 NextAuth: JWT callback triggered');
+        }
         if (user) {
-          console.log('✅ NextAuth: Adding user to token');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ NextAuth: Adding user to token');
+          }
           token.role = user.role
         }
         return token
@@ -129,11 +149,15 @@ export const authOptions: NextAuthOptions = {
     },
     session: async ({ session, token }) => {
       try {
-        console.log('📋 NextAuth: Session callback triggered');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('📋 NextAuth: Session callback triggered');
+        }
         if (token) {
           session.user.id = token.sub
           session.user.role = typeof token.role === 'string' ? token.role : undefined
-          console.log('✅ NextAuth: Session updated successfully');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ NextAuth: Session updated successfully');
+          }
         }
         return session
       } catch (error) {
