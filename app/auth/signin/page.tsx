@@ -16,14 +16,6 @@ import { Navbar } from '@/src/components/layout/Navbar'
 
 const images = [
   "/images/signin-art.png",
-  "/images/signin-art.png",
-  "/images/signin-art.png",
-  "/images/signin-art.png",
-  // "/images/signin-art.png",
-  // "/images/signin-art2.png",
-  // "/images/signin-art3.png",
-  // "/images/signin-art4.png",
-
 ]
 
 export default function SignInPage() {
@@ -35,12 +27,14 @@ export default function SignInPage() {
 
   const router = useRouter()
 
-  // rotation auto toutes les 4s
+  // rotation auto toutes les 4s - désactivée avec une seule image
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % images.length)
-    }, 4000)
-    return () => clearInterval(interval)
+    if (images.length > 1) {
+      const interval = setInterval(() => {
+        setIndex((prev) => (prev + 1) % images.length)
+      }, 4000)
+      return () => clearInterval(interval)
+    }
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,7 +52,8 @@ export default function SignInPage() {
         toast.error('Invalid credentials. Please try again.')
       } else {
         toast.success('Welcome back!')
-        router.push('/dashboard')
+        // Use replace for faster redirection without history entry
+        router.replace('/dashboard')
       }
     } catch (error) {
       toast.error('Something went wrong. Please try again.')
@@ -70,10 +65,13 @@ export default function SignInPage() {
   const handleGithubSignIn = async () => {
     setGithubLoading(true)
     try {
-      await signIn('github', { callbackUrl: '/dashboard' })
+      // Use redirect: true for faster server-side redirection
+      await signIn('github', { 
+        callbackUrl: '/dashboard',
+        redirect: true 
+      })
     } catch (error) {
       toast.error('Failed to sign in with GitHub')
-    } finally {
       setGithubLoading(false)
     }
   }
