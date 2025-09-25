@@ -65,10 +65,10 @@ const SignupPage: React.FC = () => {
 
         if (result?.error) {
           toast.error("Erreur lors de la connexion automatique. Veuillez vous connecter manuellement.");
-          router.replace('/auth/signin');
+          window.location.href = '/auth/signin';
         } else {
           toast.success("Bienvenue !");
-          router.replace('/dashboard');
+          window.location.href = '/dashboard';
         }
       }
     } catch (err) {

@@ -54,8 +54,8 @@ export default function SignInPage() {
         toast.error('Invalid credentials. Please try again.')
       } else {
         toast.success('Welcome back!')
-        // Use replace for faster redirection without history entry
-        router.replace('/dashboard')
+        // Force redirection
+        window.location.href = '/dashboard'
       }
     } catch (error) {
       toast.error('Something went wrong. Please try again.')
