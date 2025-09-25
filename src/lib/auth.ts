@@ -109,6 +109,29 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       console.log('🔐 SignIn callback:', { provider: account?.provider, email: user?.email });
+      
+      // Pour GitHub, créer l'utilisateur s'il n'existe pas
+      if (account?.provider === 'github' && user?.email) {
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email }
+          })
+          
+          if (!existingUser) {
+            await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name || user.email.split('@')[0],
+                role: 'USER',
+                password: '', // Pas de mot de passe pour les utilisateurs GitHub
+              }
+            })
+          }
+        } catch (error) {
+          console.error('Error creating GitHub user:', error)
+        }
+      }
+      
       return true;
     },
     jwt: async ({ user, token, account }) => {
@@ -128,14 +151,26 @@ export const authOptions: NextAuthOptions = {
     },
     async redirect({ url, baseUrl }) {
       console.log('🔄 Redirect callback:', { url, baseUrl });
+      
+      // Toujours rediriger vers le dashboard après connexion/inscription réussie
+      if (url === baseUrl || url === `${baseUrl}/` || url === '/') {
+        return `${baseUrl}/dashboard`
+      }
+      
       // Si c'est une URL relative, construire l'URL complète
       if (url.startsWith('/')) {
+        // Si c'est une page d'auth, rediriger vers le dashboard
+        if (url.startsWith('/auth/')) {
+          return `${baseUrl}/dashboard`
+        }
         return `${baseUrl}${url}`
       }
+      
       // Si l'URL contient déjà le baseUrl, la retourner telle quelle
       if (url.startsWith(baseUrl)) {
         return url
       }
+      
       // Par défaut, rediriger vers le dashboard
       return `${baseUrl}/dashboard`
     },

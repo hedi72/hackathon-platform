@@ -65,10 +65,15 @@ const SignupPage: React.FC = () => {
 
         if (result?.error) {
           toast.error("Erreur lors de la connexion automatique. Veuillez vous connecter manuellement.");
-          window.location.href = '/auth/signin';
+          router.push('/auth/signin');
         } else {
           toast.success("Bienvenue !");
-          window.location.href = '/dashboard';
+          // Utiliser router.push pour une meilleure gestion de la navigation
+          router.push('/dashboard');
+          // Fallback pour garantir la redirection
+          setTimeout(() => {
+            window.location.href = '/dashboard'
+          }, 100);
         }
       }
     } catch (err) {

@@ -54,8 +54,12 @@ export default function SignInPage() {
         toast.error('Invalid credentials. Please try again.')
       } else {
         toast.success('Welcome back!')
-        // Force redirection
-        window.location.href = '/dashboard'
+        // Utiliser router.push pour une meilleure gestion de la navigation
+        router.push('/dashboard')
+        // Fallback pour garantir la redirection
+        setTimeout(() => {
+          window.location.href = '/dashboard'
+        }, 100)
       }
     } catch (error) {
       toast.error('Something went wrong. Please try again.')
