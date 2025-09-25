@@ -24,6 +24,8 @@ const SignupPage: React.FC = () => {
   const [githubLoading, setGithubLoading] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
   
+  const isGithubEnabled = process.env.NEXT_PUBLIC_GITHUB_ENABLED === 'true'
+  
   const router = useRouter();
 
   // Désactiver le carousel avec une seule image
@@ -77,6 +79,12 @@ const SignupPage: React.FC = () => {
   };
 
   const handleGithubSignUp = async () => {
+    // Vérifier si GitHub est configuré
+    if (!isGithubEnabled) {
+      toast.error('GitHub authentication is not configured. Please use email/password.')
+      return
+    }
+    
     setGithubLoading(true);
     try {
       await signIn('github', { 
@@ -84,7 +92,8 @@ const SignupPage: React.FC = () => {
         redirect: true 
       });
     } catch (error) {
-      toast.error('Failed to sign up with GitHub');
+      console.error('GitHub signup error:', error)
+      toast.error('Failed to sign up with GitHub. Please try again.');
       setGithubLoading(false);
     }
   };
@@ -122,16 +131,17 @@ const SignupPage: React.FC = () => {
             <CardContent className="space-y-4">
               <Button
                 variant="outline"
-                className="w-full"
+                className={`w-full ${!isGithubEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={handleGithubSignUp}
-                disabled={githubLoading}
+                disabled={githubLoading || !isGithubEnabled}
+                title={!isGithubEnabled ? 'GitHub authentication not configured' : 'Sign up with GitHub'}
               >
                 {githubLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <Github className="mr-2 h-4 w-4" />
                 )}
-                Continue with GitHub
+                {!isGithubEnabled ? 'GitHub (Not Configured)' : 'Continue with GitHub'}
               </Button>
               
               <div className="relative">
@@ -191,7 +201,7 @@ const SignupPage: React.FC = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
 export default SignupPage;

@@ -24,6 +24,8 @@ export default function SignInPage() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [index, setIndex] = useState(0)
+  
+  const isGithubEnabled = process.env.NEXT_PUBLIC_GITHUB_ENABLED === 'true'
 
   const router = useRouter()
 
@@ -63,6 +65,12 @@ export default function SignInPage() {
   }
 
   const handleGithubSignIn = async () => {
+    // Vérifier si GitHub est configuré
+    if (!isGithubEnabled) {
+      toast.error('GitHub authentication is not configured. Please use email/password.')
+      return
+    }
+    
     setGithubLoading(true)
     try {
       // Use redirect: true for faster server-side redirection
@@ -71,7 +79,8 @@ export default function SignInPage() {
         redirect: true 
       })
     } catch (error) {
-      toast.error('Failed to sign in with GitHub')
+      console.error('GitHub signin error:', error)
+      toast.error('Failed to sign in with GitHub. Please try again.')
       setGithubLoading(false)
     }
   }
@@ -112,16 +121,17 @@ export default function SignInPage() {
             <CardContent className="space-y-4">
               <Button
                 variant="outline"
-                className="w-full"
+                className={`w-full ${!isGithubEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={handleGithubSignIn}
-                disabled={githubLoading}
+                disabled={githubLoading || !isGithubEnabled}
+                title={!isGithubEnabled ? 'GitHub authentication not configured' : 'Sign in with GitHub'}
               >
                 {githubLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <Github className="mr-2 h-4 w-4" />
                 )}
-                Continue with GitHub
+                {!isGithubEnabled ? 'GitHub (Not Configured)' : 'Continue with GitHub'}
               </Button>
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
