@@ -1,0 +1,346 @@
+{
+  "info": {
+    "name": "Hackathon Platform API",
+    "description": "Collection complète des endpoints API pour la plateforme de hackathons",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health & Test",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/health",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Test Database Connection",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/test-connection",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "test-connection"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/signup",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "auth", "signup"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Session",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{session_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/session",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "auth", "session"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/callback/credentials",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "auth", "callback", "credentials"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign Out",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{session_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/signout",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "auth", "signout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Events & Organization",
+      "item": [
+        {
+          "name": "Get Organized Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{session_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/organize",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "organize"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{session_cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Hackathon IA 2025\",\n  \"description\": \"Un hackathon dédié à l'intelligence artificielle et au machine learning\",\n  \"imageUrl\": \"https://example.com/hackathon.jpg\",\n  \"startDate\": \"2025-10-15T09:00:00.000Z\",\n  \"endDate\": \"2025-10-17T18:00:00.000Z\",\n  \"location\": \"Paris, France\",\n  \"isVirtual\": false,\n  \"maxTeamSize\": 4,\n  \"prizePool\": 5000,\n  \"rules\": \"Respecter les règles de fair-play et d'innovation\",\n  \"requirements\": \"Expérience en programmation requise\",\n  \"categories\": [\"IA\", \"Machine Learning\", \"Web\"]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/organize",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "organize"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Get All Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/projects",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "projects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{session_cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"AI Chat Assistant\",\n  \"description\": \"Un assistant de chat intelligent utilisant GPT-4\",\n  \"imageUrl\": \"https://example.com/project.jpg\",\n  \"repoUrl\": \"https://github.com/user/ai-chat\",\n  \"demoUrl\": \"https://ai-chat-demo.vercel.app\",\n  \"techStack\": [\"React\", \"Next.js\", \"OpenAI\", \"TypeScript\"],\n  \"eventId\": \"event_id_here\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/projects",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "projects"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Static Pages",
+      "item": [
+        {
+          "name": "Home Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/",
+              "host": ["{{BASE_URL}}"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{session_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/dashboard",
+              "host": ["{{BASE_URL}}"],
+              "path": ["dashboard"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Events Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/events",
+              "host": ["{{BASE_URL}}"],
+              "path": ["events"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/auth/signin",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "signin"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign Up Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/auth/signup",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "signup"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "https://hackathon-platform-sigma.vercel.app",
+      "type": "string"
+    },
+    {
+      "key": "LOCAL_URL",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "session_cookie",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "noauth"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Script pour automatiser l'authentification si nécessaire",
+          "// console.log('Pré-requête pour:', pm.request.url);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Tests automatiques pour vérifier les réponses",
+          "pm.test('Status code should be successful', function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 302]);",
+          "});",
+          "",
+          "// Capture du cookie de session pour les requêtes suivantes",
+          "if (pm.response.headers.get('Set-Cookie')) {",
+          "    const cookies = pm.response.headers.get('Set-Cookie');",
+          "    if (cookies.includes('next-auth')) {",
+          "        pm.environment.set('session_cookie', cookies);",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ]
+}
