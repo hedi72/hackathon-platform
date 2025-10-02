@@ -34,9 +34,13 @@ import {
   Settings,
   Bookmark,
   Lightbulb,
-  Briefcase
+  Briefcase,
+  Camera,
+  Upload,
+  ImageIcon
 } from 'lucide-react'
 import Link from 'next/link'
+import { useToast } from '../../hooks/use-toast'
 
 interface UserProfile {
   id: string
@@ -86,13 +90,17 @@ interface Achievement {
 }
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, isLoading } = useAuth()
+  const { user, isAuthenticated, isLoading, updateUserImage } = useAuth()
+  const { toast } = useToast()
   const [isEditing, setIsEditing] = useState(false)
   const [showPublicView, setShowPublicView] = useState(false)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [userStats, setUserStats] = useState<UserStats | null>(null)
   const [participations, setParticipations] = useState<HackathonParticipation[]>([])
   const [achievements, setAchievements] = useState<Achievement[]>([])
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [editForm, setEditForm] = useState({
     name: '',
     bio: '',
@@ -243,6 +251,101 @@ export default function ProfilePage() {
     }
   }
 
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      // Vérifier le type de fichier
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Format non supporté",
+          description: "Veuillez sélectionner une image valide (JPG, PNG, etc.).",
+          variant: "destructive",
+          duration: 4000,
+        })
+        return
+      }
+
+      // Vérifier la taille du fichier (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Fichier trop volumineux",
+          description: "La taille de l'image ne doit pas dépasser 5MB.",
+          variant: "destructive",
+          duration: 4000,
+        })
+        return
+      }
+
+      setSelectedImage(file)
+
+      // Créer une preview de l'image
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string)
+        toast({
+          title: "Image sélectionnée",
+          description: "Cliquez sur le bouton vert pour confirmer la mise à jour.",
+          duration: 3000,
+        })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleImageUpload = async () => {
+    if (!selectedImage || !profile) return
+
+    setIsUploadingImage(true)
+
+    try {
+      // Simuler un upload (remplacer par votre API)
+      await new Promise(resolve => setTimeout(resolve, 2000))
+
+      // Mettre à jour le profil avec la nouvelle image
+      const newImageUrl = imagePreview || profile.image
+      const updatedProfile = {
+        ...profile,
+        image: newImageUrl
+      }
+
+      setProfile(updatedProfile)
+      
+      // Mettre à jour l'image dans le store global pour synchroniser avec la navbar
+      if (newImageUrl) {
+        updateUserImage(newImageUrl)
+      }
+      
+      setImagePreview(null)
+      setSelectedImage(null)
+      
+      // Notification de succès
+      toast({
+        title: "Image de profil mise à jour",
+        description: "Votre photo de profil a été mise à jour avec succès dans toute l'application.",
+        duration: 3000,
+      })
+      
+      console.log('Image de profil mise à jour:', updatedProfile)
+    } catch (error) {
+      console.error('Erreur lors de l\'upload de l\'image:', error)
+      
+      // Notification d'erreur
+      toast({
+        title: "Erreur de mise à jour",
+        description: "Une erreur s'est produite lors de la mise à jour de votre photo de profil.",
+        variant: "destructive",
+        duration: 5000,
+      })
+    } finally {
+      setIsUploadingImage(false)
+    }
+  }
+
+  const handleImageCancel = () => {
+    setSelectedImage(null)
+    setImagePreview(null)
+  }
+
   // Calculate profile completion percentage
   const calculateCompletionPercentage = () => {
     if (!profile) return 0
@@ -390,26 +493,77 @@ export default function ProfilePage() {
           <div className="px-4 md:px-8 py-6">
             <div className="flex flex-col md:flex-row items-start justify-between mb-6 gap-6">
               <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6 w-full md:w-auto">
-                <Avatar className="w-24 h-24 ring-4 ring-blue-100 shadow-lg hover:ring-blue-200 transition-all duration-300">
-                  <AvatarImage src={profile.image} alt={profile.name} />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-300 via-blue-400 to-indigo-500 text-white text-3xl font-bold relative overflow-hidden">
-                    {/* Pattern géométrique comme dans l'image */}
-                    <div className="absolute inset-0 opacity-20">
-                      <div className="grid grid-cols-3 grid-rows-3 h-full w-full">
-                        <div className="bg-white/30"></div>
-                        <div className="bg-white/10"></div>
-                        <div className="bg-white/30"></div>
-                        <div className="bg-white/10"></div>
-                        <div className="bg-white/40"></div>
-                        <div className="bg-white/10"></div>
-                        <div className="bg-white/30"></div>
-                        <div className="bg-white/10"></div>
-                        <div className="bg-white/30"></div>
+                <div className="relative group">
+                  <Avatar className="w-24 h-24 ring-4 ring-blue-100 shadow-lg hover:ring-blue-200 transition-all duration-300">
+                    <AvatarImage 
+                      src={imagePreview || profile.image} 
+                      alt={profile.name}
+                      className="object-cover" 
+                    />
+                    <AvatarFallback className="bg-gradient-to-br from-blue-300 via-blue-400 to-indigo-500 text-white text-3xl font-bold relative overflow-hidden">
+                      {/* Pattern géométrique comme dans l'image */}
+                      <div className="absolute inset-0 opacity-20">
+                        <div className="grid grid-cols-3 grid-rows-3 h-full w-full">
+                          <div className="bg-white/30"></div>
+                          <div className="bg-white/10"></div>
+                          <div className="bg-white/30"></div>
+                          <div className="bg-white/10"></div>
+                          <div className="bg-white/40"></div>
+                          <div className="bg-white/10"></div>
+                          <div className="bg-white/30"></div>
+                          <div className="bg-white/10"></div>
+                          <div className="bg-white/30"></div>
+                        </div>
+                      </div>
+                      <span className="relative z-10">{profile.name.charAt(0)}</span>
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  {/* Image Upload Overlay */}
+                  {!showPublicView && (
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 rounded-full transition-all duration-300 flex items-center justify-center">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <label htmlFor="profile-image-upload" className="cursor-pointer">
+                          <div className="bg-white rounded-full p-2 shadow-lg hover:shadow-xl transition-shadow">
+                            <Camera className="w-5 h-5 text-gray-700" />
+                          </div>
+                        </label>
+                        <input
+                          id="profile-image-upload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageSelect}
+                          className="hidden"
+                        />
                       </div>
                     </div>
-                    <span className="relative z-10">{profile.name.charAt(0)}</span>
-                  </AvatarFallback>
-                </Avatar>
+                  )}
+                  
+                  {/* Image Preview Actions */}
+                  {selectedImage && imagePreview && (
+                    <div className="absolute -bottom-2 -right-2 flex gap-1">
+                      <Button
+                        size="sm"
+                        onClick={handleImageUpload}
+                        disabled={isUploadingImage}
+                        className="bg-green-600 hover:bg-green-700 text-white rounded-full w-8 h-8 p-0"
+                      >
+                        {isUploadingImage ? (
+                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <Upload className="w-3 h-3" />
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleImageCancel}
+                        className="bg-red-600 hover:bg-red-700 text-white rounded-full w-8 h-8 p-0"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
                 
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -690,6 +844,73 @@ export default function ProfilePage() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">Edit Profile</h3>
                     <p className="text-sm text-gray-600">Update your information to complete your profile</p>
+                  </div>
+                </div>
+
+                {/* Profile Image Upload Section */}
+                <div className="mb-8">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                    <ImageIcon className="w-4 h-4 text-blue-500" />
+                    Profile Picture
+                  </label>
+                  <div className="flex items-center gap-6">
+                    <div className="relative">
+                      <Avatar className="w-20 h-20 ring-2 ring-gray-200">
+                        <AvatarImage 
+                          src={imagePreview || profile?.image} 
+                          alt={profile?.name}
+                          className="object-cover" 
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-blue-300 to-indigo-500 text-white text-2xl font-bold">
+                          {profile?.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      {selectedImage && imagePreview && (
+                        <div className="absolute -bottom-1 -right-1 flex gap-1">
+                          <Button
+                            size="sm"
+                            onClick={handleImageUpload}
+                            disabled={isUploadingImage}
+                            className="bg-green-600 hover:bg-green-700 text-white rounded-full w-6 h-6 p-0"
+                          >
+                            {isUploadingImage ? (
+                              <div className="w-2 h-2 border border-white border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                              <Upload className="w-2 h-2" />
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={handleImageCancel}
+                            className="bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 p-0"
+                          >
+                            <X className="w-2 h-2" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <label htmlFor="profile-image-edit" className="cursor-pointer">
+                        <div className="flex items-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-colors duration-200">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                            <Camera className="w-5 h-5 text-gray-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">
+                              {selectedImage ? 'Change profile picture' : 'Upload profile picture'}
+                            </p>
+                            <p className="text-xs text-gray-500">JPG, PNG up to 5MB</p>
+                          </div>
+                        </div>
+                      </label>
+                      <input
+                        id="profile-image-edit"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                      />
+                    </div>
                   </div>
                 </div>
 

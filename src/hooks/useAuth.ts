@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/auth'
 
 export function useAuth() {
   const { data: session, status } = useSession()
-  const { user, isLoading, setUser, setLoading } = useAuthStore()
+  const { user, isLoading, setUser, setLoading, updateUserImage } = useAuthStore()
 
   useEffect(() => {
     if (status === 'loading') {
@@ -20,5 +20,6 @@ export function useAuth() {
     isLoading: status === 'loading' || isLoading,
     isAuthenticated: !!session,
     session,
+    updateUserImage,
   }
 }

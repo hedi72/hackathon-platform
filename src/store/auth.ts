@@ -14,6 +14,7 @@ interface AuthState {
   isLoading: boolean
   setUser: (user: User | null) => void
   setLoading: (loading: boolean) => void
+  updateUserImage: (imageUrl: string) => void
   logout: () => void
 }
 
@@ -22,5 +23,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: true,
   setUser: (user) => set({ user }),
   setLoading: (isLoading) => set({ isLoading }),
+  updateUserImage: (imageUrl) => set((state) => ({
+    user: state.user ? { ...state.user, image: imageUrl } : state.user
+  })),
   logout: () => set({ user: null, isLoading: false }),
 }))
