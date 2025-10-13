@@ -40,6 +40,7 @@ export function Navbar() {
     { name: 'Events', href: '/events', icon: Calendar },
     // { name: 'Projects', href: '/projects', icon: Code },
     { name: 'Organizations', href: '/organization', icon: Building2 },
+    { name: 'Hackathons', href: '/hackathons', icon: Code },
   ]
 
   const closeMobileMenu = () => setMobileMenuOpen(false)
