@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -14,8 +15,10 @@ import { Calendar, Code, Home, LogOut, Settings, User, Menu, X } from 'lucide-re
 import { signOut } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export function Navbar() {
+  const router = useRouter()
   const { user, isAuthenticated } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -32,13 +35,13 @@ export function Navbar() {
   const navLinks = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Events', href: '/events', icon: Calendar },
-    { name: 'Projects', href: '/projects', icon: Code },
+    //{ name: 'Projects', href: '/projects', icon: Code },
   ]
 
   const closeMobileMenu = () => setMobileMenuOpen(false)
 
   return (
-<nav className="sticky top-0  navbar-gradient backdrop-blur-md shadow-lg rounded-b-2xl border-b border-white/20">
+<nav className="sticky top-0  navbar-gradient backdrop-blur-md shadow-lg rounded-b-2xl border-b border-white/20 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
@@ -70,6 +73,15 @@ export function Navbar() {
                     <span>{link.name}</span>
                   </Link>
                 ))}
+                 <Select onValueChange={(value) => router.push(value)}>
+      <SelectTrigger className="w-40 bg-transparent text-blue-600 font-semibold hover:shadow-xl">
+        <SelectValue placeholder="Projects" />
+      </SelectTrigger>
+      <SelectContent className="bg-white shadow-lg rounded-lg">
+        <SelectItem value="/projects">BUIDLs</SelectItem>
+        <SelectItem value="/collections">Collections</SelectItem>
+      </SelectContent>
+    </Select>
               </div>
               </div>
 
