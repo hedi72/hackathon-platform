@@ -68,7 +68,7 @@ export default function BuidlCard({
 
       {/* Tags */}
       <div className="mt-3">
-        <span className="inline-block px-3 py-1 bg-orange-100 text-blue-600 text-xs font-medium rounded">
+        <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-medium rounded">
           {formatCategories(categories)}
         </span>
       </div>
