@@ -20,6 +20,21 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       colors: {
+        primary: {
+        50: 'rgb(var(--primary-50-rgb))',
+        100: 'rgb(var(--primary-100-rgb))',
+        200: 'rgb(var(--primary-200-rgb))',
+        300: 'rgb(var(--primary-300-rgb))',
+        400: 'rgb(var(--primary-400-rgb))',
+        500: 'rgb(var(--primary-500-rgb))',
+        600: 'rgb(var(--primary-600-rgb))',
+        700: 'rgb(var(--primary-700-rgb))',
+        800: 'rgb(var(--primary-800-rgb))',
+        900: 'rgb(var(--primary-900-rgb))',
+        DEFAULT: 'rgb(var(--primary-500-rgb))',
+        foreground: 'var(--primary-foreground)',
+      },
+
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -30,10 +45,10 @@ const config: Config = {
           DEFAULT: 'hsl(var(--popover))',
           foreground: 'hsl(var(--popover-foreground))',
         },
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
+        // primary: {
+        //   DEFAULT: 'hsl(var(--primary))',
+        //   foreground: 'hsl(var(--primary-foreground))',
+        // },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
