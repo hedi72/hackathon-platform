@@ -6,6 +6,10 @@ import { Footer } from '../src/components/layout/Footer'
 import { Calendar, Users, Trophy, Code, ArrowRight, Zap, Globe, Shield } from 'lucide-react'
 import HeroSection from '@/src/components/ui/home-components/HeroSection'
 import HackathonsSection from '@/src/components/ui/home-components/HackathonSection'
+import ExploreCategories from '@/src/components/ui/home-components/ExploreCategories'
+import CertificationSection from '@/src/components/ui/home-components/CertificationSection'
+import FAQSection from '@/src/components/ui/home-components/FAQSection'
+import JoinCommunitySection from '@/src/components/ui/home-components/JoinCommunitySection'
 
 export default function HomePage() {
   const features = [
@@ -100,13 +104,17 @@ export default function HomePage() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
+      <section className="relative py-20">
+        <div className="max-w-full mx-auto text-center">
            <HeroSection />
-           <HackathonsSection hackathons={hackathons.slice(0, 4)}/>
+           <div className='border-2 border-black min-w-full mt-10 mb-6'></div>
+           <HackathonsSection/>
+           <ExploreCategories/>
+           <CertificationSection/>
+           <FAQSection/>
+           <JoinCommunitySection/>
         </div>
       </section>
-
       <Footer />
     </div>
   )
