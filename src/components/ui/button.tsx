@@ -5,7 +5,7 @@ import clsx from "clsx";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "md" | "lg";
-  variant?: "primary" | "secondary" | "outline";
+  variant?: "primary" | "secondary" | "outline" | "rounded";
   withShadow?: boolean;
 }
 
@@ -26,11 +26,16 @@ export default function ButtonUI({
 
   const variantClasses = {
     primary:
-      "bg-primary text-white hover:bg-[var(--primary-600)]",
+      "bg-primary text-white hover:bg-[var(--primary-600)]  rounded-xl",
     secondary:
-      "bg-white text-black hover:bg-gray-300",
+      "bg-white text-black hover:bg-gray-300  rounded-xl",
     outline:
-      "border border-black text-black hover:bg-black hover:text-white"
+      "border border-black text-black hover:bg-black hover:text-white  rounded-xl",
+    rounded:
+     "font-semibold text-black transition-all duration-300 " +
+      "bg-primary-600 border-[3px] border-[#18191F] " +
+      "shadow-[4px_4px_0px_#151528] rounded-full " +
+      "hover:bg-[#FDD132]",
   };
 
   const shadowStyles = withShadow
@@ -40,7 +45,7 @@ export default function ButtonUI({
   return (
     <button
       className={clsx(
-        "font-semibold transition-all duration-300 rounded-md",
+        "font-semibold transition-all duration-300",
         sizeClasses[size],
         variantClasses[variant],
         className
