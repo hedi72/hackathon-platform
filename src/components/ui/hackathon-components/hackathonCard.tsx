@@ -1,6 +1,7 @@
 // components/HackathonCard.tsx
 import React from "react";
 import { Hackathon } from "../home-components/HackathonSection";
+import { useRouter } from "next/navigation";
 
 interface HackathonCardProps {
   className?: string;
@@ -14,8 +15,11 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function HackathonCard({ className = "", hackathon }: HackathonCardProps) {
+    const router = useRouter();
+  
   return (
     <div
+    onClick={()=>{router.push(`/${hackathon.id}/create-team`)}}
       className={`bg-white border-[3px] border-[#18191F] shadow-[4px_4px_0px_#151528] rounded-xl p-6 flex flex-col justify-between text-left ${className}`}
     >
       <span

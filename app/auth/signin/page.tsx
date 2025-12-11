@@ -30,14 +30,14 @@ export default function SignInPage() {
   const router = useRouter()
 
   // rotation auto toutes les 4s - désactivée avec une seule image
-  useEffect(() => {
-    if (images.length > 1) {
-      const interval = setInterval(() => {
-        setIndex((prev) => (prev + 1) % images.length)
-      }, 4000)
-      return () => clearInterval(interval)
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (images.length > 1) {
+  //     const interval = setInterval(() => {
+  //       setIndex((prev) => (prev + 1) % images.length)
+  //     }, 4000)
+  //     return () => clearInterval(interval)
+  //   }
+  // }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

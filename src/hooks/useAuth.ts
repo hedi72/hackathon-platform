@@ -1,9 +1,9 @@
-import { useSession } from 'next-auth/react'
+// import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import { useAuthStore } from '../store/auth'
 
 export function useAuth() {
-  const { data: session, status } = useSession()
+  // const { data: session, status } = useSession()
   const { user, isLoading, setUser, setLoading, updateUserImage } = useAuthStore()
 
   useEffect(() => {
@@ -11,15 +11,15 @@ export function useAuth() {
       setLoading(true)
     } else {
       setLoading(false)
-      setUser(session?.user as any || null)
+      // setUser(session?.user as any || null)
     }
-  }, [session, status, setUser, setLoading])
+  }, [ status, setUser, setLoading])
 
   return {
     user,
     isLoading: status === 'loading' || isLoading,
-    isAuthenticated: !!session,
-    session,
+     isAuthenticated: false,
+    // session,
     updateUserImage,
   }
 }

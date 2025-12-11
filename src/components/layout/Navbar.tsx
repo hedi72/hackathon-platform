@@ -257,7 +257,7 @@ export function Navbar() {
                 ) : (
                   <div className="flex items-center gap-3">
                     <Link href="/auth/signin">
-                      <Button className=" text-black font-semibold hover:bg-blue-700 bg-transparent">
+                      <Button className=" text-black font-semibold bg-transparent">
                         Sign In
                       </Button>
                     </Link>
