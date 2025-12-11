@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import ButtonUI from "../button";
 import HackathonCard from "../hackathon-components/hackathonCard";
 import { getHackathons } from "@/src/api/hackathon/hackathons";
+import { useRouter } from "next/navigation";
 
 export interface Hackathon {
   id: string;
@@ -36,6 +37,7 @@ export interface Hackathon {
 
 export default function HackathonsSection() {
   const [hackathons, setHackathons] = useState<Hackathon[]>([]);
+   const router = useRouter();
 
   useEffect(() => {
     async function load() {
@@ -89,8 +91,15 @@ export default function HackathonsSection() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
         {hackathons.map((hackathon) => (
+          <div
+  key={hackathon.id}
+  onClick={() => router.push(`/hackathons/${hackathon.id}`)}
+  className="cursor-pointer"
+>
           <HackathonCard key={hackathon.id} hackathon={hackathon} />
+          </div>
         ))}
       </div>
     </div>

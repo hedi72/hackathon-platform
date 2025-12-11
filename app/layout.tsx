@@ -1,11 +1,15 @@
+import { Outfit } from "next/font/google";
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import { AuthProvider } from '../src/components/providers/AuthProvider'
 import { Toaster } from '@/components/ui/sonner'
 import { Toaster as ToastToaster } from '@/components/ui/toaster'
 
-const inter = Inter({ subsets: ['latin'] })
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  weight: ["400", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: 'HackPlatform - Host & Join Amazing Hackathons',
@@ -19,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={outfit.className}>
         <AuthProvider>
           {children}
           <Toaster />
