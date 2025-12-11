@@ -15,6 +15,9 @@ const config: Config = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      fontFamily: {
+        sans: ["var(--font-outfit)", "sans-serif"],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -35,6 +38,7 @@ const config: Config = {
         DEFAULT: 'rgb(var(--primary-500-rgb))',
         foreground: 'var(--primary-foreground)',
       },
+
 
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
