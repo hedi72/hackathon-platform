@@ -57,7 +57,7 @@ export default function TeamCreationPreview({ formData, onSubmit, isSubmitting }
           disabled={!isFormValid || isSubmitting}
           className={`w-full py-3 px-4 rounded-xl font-semibold transition-all shadow-sm hover:shadow-md ${
             isFormValid 
-              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white' 
+              ? 'bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white' 
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
           } ${isSubmitting ? 'opacity-70' : ''}`}
         >

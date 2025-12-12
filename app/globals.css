@@ -18,16 +18,16 @@
 
 :root {
   /* Primary palette - hex */
-  --primary-50:  #eff6ff;
-  --primary-100: #dbeafe;
-  --primary-200: #bfdbfe;
-  --primary-300: #93c5fd;
-  --primary-400: #60a5fa;
-  --primary-500: #FF4B1E;
-  --primary-600: #FEC601;
-  --primary-700: #1d4ed8;
-  --primary-800: #1e40af;
-  --primary-900: #1e3a8a;
+--primary-50:  #FFF1EC;   /* plus clair que 100, ultra pastel */
+--primary-100: #FFD3C7;   
+--primary-200: #FFB6A1;   /* un peu plus saturé */
+--primary-300: #FF9578;   /* medium-light */
+--primary-400: #FF6F46;   /* proche du 500 mais plus clair */
+--primary-500: #FF4B1E;  
+--primary-600: #FEC601;   /* plus foncé + saturé */
+--primary-700: #B52F11;   /* foncé / chaud */
+--primary-800: #8A220D;   /* deep warm */
+--primary-900: #611506; 
   /* Secondary palette - gray */
   --gray-50:  #f9fafb;
   --gray-100: #f3f4f6;

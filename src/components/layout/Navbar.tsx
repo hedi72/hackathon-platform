@@ -12,12 +12,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Calendar, Code, Home, LogOut, Settings, User, Menu, X, Building2, ChevronDown, Bell, Search, Mail, Plus, HelpCircle, BookOpen, Users as UsersIcon, MessageSquare } from 'lucide-react'
+import { Calendar, Code, Home, LogOut, Settings, User, Menu, Building2, ChevronDown, Bell, Search, Mail, Plus, HelpCircle, BookOpen, Users as UsersIcon, MessageSquare, Check, Loader2 } from 'lucide-react'
+// Import X séparément pour éviter le conflit
+import { X } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import ButtonUI from '../ui/button'
+import { useNotifications } from '@/src/hooks/useNotifications'
+import { formatDistanceToNow } from 'date-fns'
+import { cn } from '@/lib/utils'
+import { NotificationItem, NotificationType } from '@/src/api/notifications/getNotifications'
 
 export function Navbar() {
   const router = useRouter()
@@ -25,7 +31,23 @@ export function Navbar() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true)
+  const [processingNotifications, setProcessingNotifications] = useState<Set<string>>(new Set());
+  
+  const {
+    notifications,
+    loading,
+    error,
+    page,
+    total,
+    nextPage,
+    prevPage,
+    markAsRead,
+    markAllAsRead,
+    acceptTeamInvite,
+    declineTeamInvite,
+    hasUnreadNotifications,
+    refresh,
+  } = useNotifications(1, 10);
 
   useEffect(() => {
     console.log('User authentication status:', isAuthenticated)
@@ -49,18 +71,18 @@ export function Navbar() {
   const getDropdownItemClass = (href: string) => {
     const isActive = pathname === href
     return `rounded-lg ${isActive 
-      ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200' 
+      ? 'bg-gradient-to-r from-primary-50 to-indigo-50 border border-primary-200' 
       : 'hover:bg-purple-50'}`
   }
 
   const getDropdownIconClass = (href: string) => {
     const isActive = pathname === href
-    return `w-5 h-5 ${isActive ? 'text-blue-600' : 'text-purple-600'}`
+    return `w-5 h-5 ${isActive ? 'text-primary-600' : 'text-purple-600'}`
   }
 
   const getDropdownTextClass = (href: string) => {
     const isActive = pathname === href
-    return `font-medium ${isActive ? 'text-blue-700 font-semibold' : ''}`
+    return `font-medium ${isActive ? 'text-primary-700 font-semibold' : ''}`
   }
 
   const getNavLinkClass = (href: string) => {
@@ -71,6 +93,166 @@ export function Navbar() {
         : 'text-gray-500'
     }`
   }
+
+  const handleAcceptInvite = async (notificationId: string, teamId?: string, hackathonId?: string) => {
+    if (!teamId || !hackathonId) return;
+    
+    setProcessingNotifications(prev => {
+      const newSet = new Set(prev);
+      newSet.add(notificationId);
+      return newSet;
+    });
+    
+    try {
+      // Le hook attend hackathonId, teamId, invitationId (notificationId)
+      await acceptTeamInvite(hackathonId, teamId, notificationId);
+      // Rafraîchir les notifications après acceptation
+      setTimeout(() => {
+        refresh();
+      }, 500);
+    } catch (error) {
+      console.error('Failed to accept invite:', error);
+    } finally {
+      setProcessingNotifications(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(notificationId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleDeclineInvite = async (notificationId: string, teamId?: string, hackathonId?: string) => {
+    if (!teamId || !hackathonId) return;
+    
+    setProcessingNotifications(prev => {
+      const newSet = new Set(prev);
+      newSet.add(notificationId);
+      return newSet;
+    });
+    
+    try {
+      // Le hook attend hackathonId, teamId, invitationId (notificationId)
+      await declineTeamInvite(hackathonId, teamId, notificationId);
+      // Rafraîchir les notifications après refus
+      setTimeout(() => {
+        refresh();
+      }, 500);
+    } catch (error) {
+      console.error('Failed to decline invite:', error);
+    } finally {
+      setProcessingNotifications(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(notificationId);
+        return newSet;
+      });
+    }
+  };
+
+  const getNotificationIcon = (type: NotificationType) => {
+    switch (type) {
+      case 'TEAM_INVITE':
+      case 'TEAM_JOIN_REQUEST':
+        return <UsersIcon className="w-5 h-5 text-primary-500" />;
+      case 'SYSTEM':
+        return <Bell className="w-5 h-5 text-gray-500" />;
+      case 'MESSAGE':
+        return <MessageSquare className="w-5 h-5 text-green-500" />;
+      default:
+        return <Bell className="w-5 h-5 text-purple-500" />;
+    }
+  };
+
+  const getNotificationTitle = (type: NotificationType) => {
+    switch (type) {
+      case 'TEAM_INVITE':
+        return 'Team Invitation';
+      case 'TEAM_JOIN_REQUEST':
+        return 'Team Join Request';
+      case 'MESSAGE':
+        return 'New Message';
+      case 'SYSTEM':
+        return 'System Notification';
+      default:
+        return 'Notification';
+    }
+  };
+
+  const renderNotificationContent = (notification: NotificationItem) => {
+    const isTeamInvite = notification.type === 'TEAM_INVITE';
+    const isUnread = !notification.isRead;
+    const isProcessing = processingNotifications.has(notification.id);
+    
+    // Extraire les IDs depuis le payload
+    const teamId = notification.payload?.teamId;
+    const hackathonId = notification.payload?.hackathonId;
+
+    return (
+      <div className={cn(
+        "p-3 border-b last:border-b-0 transition-colors",
+        isUnread ? "bg-primary-50" : "bg-white"
+      )}>
+        <div className="flex items-start gap-3">
+          <div className="mt-1">
+            {getNotificationIcon(notification.type)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 mb-1">
+              {getNotificationTitle(notification.type)}
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              {notification.content}
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-400">
+                {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+              </span>
+              {isUnread && !isProcessing && (
+                <div className="w-2 h-2 rounded-full bg-primary-500"></div>
+              )}
+            </div>
+            
+            {isTeamInvite && teamId && hackathonId && (
+              <div className="mt-3 flex gap-2">
+                <Button
+                  size="sm"
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAcceptInvite(notification.id, teamId, hackathonId);
+                  }}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? (
+                    <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                  ) : (
+                    <Check className="w-3 h-3 mr-1" />
+                  )}
+                  Accept
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-red-500 border-red-200 hover:bg-red-50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeclineInvite(notification.id, teamId, hackathonId);
+                  }}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? (
+                    <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                  ) : (
+                    <X className="w-3 h-3 mr-1" />
+                  )}
+                  Decline
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <nav className="sticky top-0 navbar-gradient backdrop-blur-md border-b-2 border-black z-50">
@@ -111,99 +293,91 @@ export function Navbar() {
               <div className="flex items-center space-x-4">
                 {isAuthenticated ? (
                   <>
-                    {/* Navigation Icons */}
-                    <div className="flex items-center space-x-3">
-                      {/* Search Icon */}
-                      {/* <button className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
-                        <Search className="w-5 h-5 text-white/80 group-hover:text-yellow-400 transition-colors" />
-                      </button> */}
-                      
-                      {/* Mail Icon */}
-                      {/* <button className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
-                        <Mail className="w-5 h-5 text-white/80 group-hover:text-yellow-400 transition-colors" />
-                      </button> */}
-                      
-                      {/* Plus Icon with Dropdown */}
-                      {/* <DropdownMenu>
-                        <DropdownMenuTrigger className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
-                          <Plus className="w-5 h-5 text-white/80 group-hover:text-yellow-400 transition-colors" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48 bg-white shadow-lg rounded-xl p-2">
-                          <DropdownMenuItem className="rounded-lg hover:bg-purple-50">
-                            <div className="flex items-center gap-3 px-2 py-2">
-                              <Code className="w-4 h-4 text-purple-600" />
-                              <span>New Project</span>
-                            </div>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-lg hover:bg-purple-50">
-                            <div className="flex items-center gap-3 px-2 py-2">
-                              <Calendar className="w-4 h-4 text-purple-600" />
-                              <span>New Event</span>
-                            </div>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-lg hover:bg-purple-50">
-                            <div className="flex items-center gap-3 px-2 py-2">
-                              <Building2 className="w-4 h-4 text-purple-600" />
-                              <span>New Organization</span>
-                            </div>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu> */}
-                      
-                      {/* Help Icon with Dropdown */}
-                      {/* <DropdownMenu>
-                        <DropdownMenuTrigger className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
-                          <HelpCircle className="w-5 h-5 text-white/80 group-hover:text-yellow-400 transition-colors" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48 bg-white shadow-lg rounded-xl p-2">
-                          <DropdownMenuItem className="rounded-lg hover:bg-purple-50">
-                            <div className="flex items-center gap-3 px-2 py-2">
-                              <span>Help Center</span>
-                            </div>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-lg hover:bg-purple-50">
-                            <div className="flex items-center gap-3 px-2 py-2">
-                              <span>Documentation</span>
-                            </div>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-lg hover:bg-purple-50">
-                            <div className="flex items-center gap-3 px-2 py-2">
-                              <span>Contact Support</span>
-                            </div>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu> */}
-                    </div>
-                    
                     {/* Notifications */}
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="relative p-2 bg-white backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
+                      <DropdownMenuTrigger className="relative p-2 bg-primary-500 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
                         <Bell className="w-5 h-5 text-white/80 hover:text-yellow-400 transition-colors" />
                         
-                        {/* {hasUnreadNotifications && (
-                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-white"></div>
-                        )} */}
+                        {hasUnreadNotifications && (
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary-500 rounded-full border-2 border-white"></div>
+                        )}
                       </DropdownMenuTrigger>
                       
                       <DropdownMenuContent align="end" className="w-96 bg-white shadow-2xl rounded-xl p-0 border">
-                        <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+                        <div className="p-4 border-b bg-gradient-to-r from-primary-50 to-indigo-50">
                           <div className="flex items-center justify-between">
                             <h3 className="font-bold text-lg text-gray-800">Notifications</h3>
-                            <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                              Mark all as read
-                            </button>
+                            {hasUnreadNotifications && (
+                              <button 
+                                onClick={markAllAsRead}
+                                className="text-sm text-primary-600 hover:text-primary-800 font-medium"
+                              >
+                                Mark all as read
+                              </button>
+                            )}
                           </div>
                         </div>
                         
                         <div className="max-h-96 overflow-y-auto">
-                          {/* Notifications content remains the same */}
+                          {loading ? (
+                            <div className="p-8 text-center">
+                              <Loader2 className="w-8 h-8 animate-spin mx-auto text-gray-400" />
+                              <p className="mt-2 text-sm text-gray-500">Loading notifications...</p>
+                            </div>
+                          ) : error ? (
+                            <div className="p-4 text-center">
+                              <p className="text-sm text-red-500">Error loading notifications</p>
+                              <button 
+                                onClick={() => refresh()}
+                                className="mt-2 text-sm text-primary-600 hover:text-primary-800"
+                              >
+                                Retry
+                              </button>
+                            </div>
+                          ) : notifications.length === 0 ? (
+                            <div className="p-8 text-center">
+                              <Bell className="w-12 h-12 mx-auto text-gray-300" />
+                              <p className="mt-2 text-sm text-gray-500">No notifications yet</p>
+                            </div>
+                          ) : (
+                            <div>
+                              {notifications.map((notification) => (
+                                <div 
+                                  key={notification.id}
+                                  onClick={() => !notification.isRead && markAsRead(notification.id)}
+                                  className="cursor-pointer hover:bg-gray-50 transition-colors"
+                                >
+                                  {renderNotificationContent(notification)}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         
-                        <div className="p-3 border-t bg-gray-50 text-center">
-                          <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                            View all notifications
-                          </button>
-                        </div>
+                        {notifications.length > 0 && (
+                          <div className="p-3 border-t bg-gray-50 flex items-center justify-between">
+                            <div className="text-sm text-gray-500">
+                              Showing {notifications.length} of {total}
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={prevPage}
+                                disabled={page <= 1}
+                                className="text-sm text-primary-600 hover:text-primary-800 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
+                              >
+                                Previous
+                              </button>
+                              <span className="text-sm text-gray-500">|</span>
+                              <button
+                                onClick={nextPage}
+                                disabled={notifications.length < 10}
+                                className="text-sm text-primary-600 hover:text-primary-800 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
+                              >
+                                Next
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
 
@@ -306,6 +480,76 @@ export function Navbar() {
                     <span>{link.name}</span>
                   </Link>
                 ))}
+
+                {/* Mobile Notifications Section */}
+                {isAuthenticated && notifications.length > 0 && (
+                  <div className="pt-4 mt-4 border-t border-white/30">
+                    <h4 className="px-4 py-2 text-white font-semibold mb-2">Notifications</h4>
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {notifications.slice(0, 5).map((notification) => {
+                        const isProcessing = processingNotifications.has(notification.id);
+                        const isTeamInvite = notification.type === 'TEAM_INVITE';
+                        const teamId = notification.payload?.teamId;
+                        const hackathonId = notification.payload?.hackathonId;
+                        
+                        return (
+                          <div
+                            key={notification.id}
+                            className="px-4 py-3 bg-white/10 rounded-lg"
+                          >
+                            <div className="flex items-start gap-2">
+                              {getNotificationIcon(notification.type)}
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-white">
+                                  {getNotificationTitle(notification.type)}
+                                </p>
+                                <p className="text-xs text-gray-200">{notification.content}</p>
+                                {isTeamInvite && teamId && hackathonId && (
+                                  <div className="mt-2 flex gap-2">
+                                    <Button
+                                      size="sm"
+                                      className="bg-green-500 hover:bg-green-600 text-white text-xs"
+                                      onClick={() => handleAcceptInvite(notification.id, teamId, hackathonId)}
+                                      disabled={isProcessing}
+                                    >
+                                      {isProcessing ? (
+                                        <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                      ) : (
+                                        <Check className="w-3 h-3 mr-1" />
+                                      )}
+                                      Accept
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-red-500 border-red-200 hover:bg-red-50 text-xs"
+                                      onClick={() => handleDeclineInvite(notification.id, teamId, hackathonId)}
+                                      disabled={isProcessing}
+                                    >
+                                      {isProcessing ? (
+                                        <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                      ) : (
+                                        <X className="w-3 h-3 mr-1" />
+                                      )}
+                                      Decline
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <Link
+                      href="/notifications"
+                      onClick={closeMobileMenu}
+                      className="block mt-3 px-4 py-2 text-center text-sm text-yellow-400 hover:text-yellow-300"
+                    >
+                      View all notifications
+                    </Link>
+                  </div>
+                )}
 
                 {!isAuthenticated && (
                   <div className="pt-4 mt-4 border-t border-white/30 space-y-3">

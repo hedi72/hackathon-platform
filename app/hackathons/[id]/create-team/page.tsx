@@ -15,12 +15,12 @@ export default function CreateTeamPage() {
     tagline: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-   const { hackId } = useParams();
+   const { id } = useParams();
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const result = await createTeam(hackId as string, formData);
+      const result = await createTeam(id as string, formData);
       
       if (result.data) {
         toast.success('Team created successfully!');
@@ -63,7 +63,7 @@ export default function CreateTeamPage() {
                 Start collaborating with other hackers. You can invite members and add details later.
               </p>
             </div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-full">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -83,16 +83,16 @@ export default function CreateTeamPage() {
             </div>
 
             {/* Additional Info */}
-            <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6">
+            <div className="mt-6 bg-gradient-to-r from-primary-50 to-indigo-50 rounded-2xl border border-primary-100 p-6">
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 What happens next?
               </h3>
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0" />
                   <span>After creating the team, you'll be redirected to your team dashboard</span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -137,7 +137,7 @@ export default function CreateTeamPage() {
                 disabled={!isFormValid || isSubmitting}
                 className={`w-full py-3 px-4 rounded-xl font-semibold transition-all shadow-sm hover:shadow-md ${
                   isFormValid 
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white' 
+                    ? 'bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white' 
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                 } ${isSubmitting ? 'opacity-70' : ''}`}
               >
@@ -173,7 +173,7 @@ export default function CreateTeamPage() {
               <h4 className="font-semibold text-gray-900 mb-3">Tips for a Great Team Name</h4>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1" />
+                  <div className="w-1.5 h-1.5 bg-primary-500 rounded-full mt-1" />
                   <span>Keep it short and memorable</span>
                 </li>
                 <li className="flex items-start gap-2">

@@ -43,7 +43,7 @@ export default function TeamCreationForm({ formData, onChange }: TeamCreationFor
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
             placeholder="e.g., Quantum Coders"
-            className="w-full px-4 py-3 text-lg bg-white border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-gray-900 placeholder-gray-400 transition-all"
+            className="w-full px-4 py-3 text-lg bg-white border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 text-gray-900 placeholder-gray-400 transition-all"
             maxLength={50}
           />
           
@@ -59,7 +59,7 @@ export default function TeamCreationForm({ formData, onChange }: TeamCreationFor
                   key={example}
                   type="button"
                   onClick={() => handleInputChange('name', example)}
-                  className="px-3 py-1.5 text-sm bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-200 rounded-lg transition-all"
+                  className="px-3 py-1.5 text-sm bg-gray-50 hover:bg-primary-50 text-gray-700 hover:text-primary-700 border border-gray-200 hover:border-primary-200 rounded-lg transition-all"
                 >
                   {example}
                 </button>
@@ -84,32 +84,32 @@ export default function TeamCreationForm({ formData, onChange }: TeamCreationFor
             value={formData.tagline}
             onChange={(e) => handleInputChange('tagline', e.target.value)}
             placeholder="Describe your team's mission, what you're building, or the skills you're looking for..."
-            className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-gray-900 placeholder-gray-400 h-40 resize-none transition-all"
+            className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 text-gray-900 placeholder-gray-400 h-40 resize-none transition-all"
             maxLength={500}
           />
         </div>
 
         {/* tagline Tips */}
-        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+        <div className="bg-primary-50 border border-primary-100 rounded-xl p-4">
           <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <Info className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
             <div className="space-y-2">
-              <h4 className="font-medium text-blue-900">What makes a good tagline?</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
+              <h4 className="font-medium text-primary-900">What makes a good tagline?</h4>
+              <ul className="text-sm text-primary-800 space-y-1">
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                  <div className="w-1.5 h-1.5 bg-primary-500 rounded-full mt-1.5 flex-shrink-0" />
                   <span>Mention your project idea or goal</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                  <div className="w-1.5 h-1.5 bg-primary-500 rounded-full mt-1.5 flex-shrink-0" />
                   <span>Describe the type of members you're looking for</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                  <div className="w-1.5 h-1.5 bg-primary-500 rounded-full mt-1.5 flex-shrink-0" />
                   <span>Keep it concise but informative</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                  <div className="w-1.5 h-1.5 bg-primary-500 rounded-full mt-1.5 flex-shrink-0" />
                   <span>Add your contact preferences if any</span>
                 </li>
               </ul>

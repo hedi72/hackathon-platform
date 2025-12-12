@@ -3,18 +3,35 @@ export interface TeamFormData {
   tagline: string;
 }
 
-export interface Team extends TeamFormData {
-  id: string;
-  ownerId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  members: TeamMember[];
-}
+// export interface Team extends TeamFormData {
+//   id: string;
+//   ownerId: string;
+//   createdAt: Date;
+//   updatedAt: Date;
+//   members: TeamMember[];
+//   name: string;
+//   tagline?: string;
+// }
+
 
 export interface TeamMember {
   id: string;
-  userId: string;
-  teamId: string;
-  role: string;
-  joinedAt: Date;
+  isLeader: boolean;
+  joinedAt: string;
+  user: {
+    id: string;
+    username: string;
+    name: string;
+    image?: string;
+  };
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  tagline?: string;
+  image?: string;
+  createdAt: string;
+  memberCount: number;
+  members: TeamMember[];
 }

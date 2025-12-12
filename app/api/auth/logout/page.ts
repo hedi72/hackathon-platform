@@ -1,4 +1,4 @@
-import { BASE_URL } from "../../config/apiConfig";
+import { BASE_URL } from "@/src/api/config/apiConfig";
 import { checkAndRefreshToken } from "../checkAndRefreshToken";
 export const logout = async () => {
   const res = await fetch(`${BASE_URL}/auth/logout`, {

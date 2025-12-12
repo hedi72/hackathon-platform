@@ -7,6 +7,7 @@ import HackathonDetailsSection from "@/app/views/HackathonDetailsSection";
 import { useToken } from "@/app/context/TokenContext";
 import { registerToHackathon } from "@/app/api/hackathon/register";
 import SubmitBuidlModal from "@/app/views/SubmitBuidlModal";
+import HackathonTabs from "../hackathon-tabs/HackathonTabs";
 
 export default function HackathonDetails({ params }) {
   const [hackathon, setHackathon] = useState(null);
@@ -121,7 +122,7 @@ export default function HackathonDetails({ params }) {
 
 <HackathonDetailsSection hackathon={hackathon} />
 
-
+{/* <HackathonTabs/> */}
 
 </main>
 

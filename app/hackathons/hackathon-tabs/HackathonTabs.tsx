@@ -1,16 +1,99 @@
-// app/views/HackathonTabs.jsx (or in your components folder)
 "use client";
 
-import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { inviteMemberToTeam } from '@/src/api/hackathon/inviteMemberToTeam';
+import { getTeams } from '@/src/api/hackathon/team';
+import { useAuth } from '@/src/hooks/useAuth';
+import { Team } from '@/src/types/team';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function HackathonTabs() {
     const [activeTab, setActiveTab] = useState('buidls');
+    const router = useRouter();
+    const { id } = useParams();
+    const [teams, setTeams] = useState<Team[]>([]);
+    const [showInviteModal, setShowInviteModal] = useState(false);
+    const [memberIdentifier, setMemberIdentifier] = useState('');
+    const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+      const { user, isAuthenticated } = useAuth()
+       const { toast } = useToast()
+
+
+    useEffect(() => {
+        if (!id) return;
+
+        const fetchTeams = async () => {
+            try {
+                setActiveTab("team");
+                const res = await getTeams(id as string, {
+                    page: 1,
+                    limit: 10,
+                });
+                setTeams(res.data);
+            } catch (err) {
+                console.error("Error loading teams:", err);
+            }
+        };
+
+        fetchTeams();
+    }, []);
+
+    const handleInviteClick = (team: Team) => {
+        console.log('Inviting to team:', team?.members[0]?.user.id);
+        setSelectedTeam(team);
+        setShowInviteModal(true);
+    };
+
+    const handleInviteSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!memberIdentifier.trim() || !selectedTeam || !id) {
+             toast({
+                title: 'Error',
+                description: 'Please enter an email or username',
+                variant: 'destructive'
+            })
+            return;
+        }
+
+        setIsLoading(true);
+        
+        try {
+            // Appel à l'API pour inviter un membre
+            await inviteMemberToTeam(id as string, selectedTeam.id, {
+                member_identifier: memberIdentifier.trim()
+            });
+            
+            // Réinitialiser le formulaire
+            setMemberIdentifier('');
+            setShowInviteModal(false);
+            
+            // Afficher un message de succès
+             toast({
+                title: 'Success',
+                description: `Invitation sent to ${memberIdentifier} to join ${selectedTeam.name}`,
+                variant: 'default'
+            })
+            
+        } catch (error: any) {
+            console.error('Error sending invitation:', error);
+             toast({
+                title: 'Error',
+                description: error.message || 'Failed to send invitation. Please try again.',
+                variant: 'destructive'
+            })
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const tabs = [
         { id: 'details', label: 'Details' },
         { id: 'buidls', label: 'BUIDLs' },
         { id: 'hackers', label: 'Hackers', count: 292 },
-        { id: 'join-team', label: 'Join a Team' },
+        { id: 'team', label: 'Team' },
         { id: 'tracks', label: 'New Tracks' },
         { id: 'dates', label: 'Important Dates' },
         { id: 'submission', label: 'Submission Requirements' },
@@ -115,7 +198,7 @@ export default function HackathonTabs() {
                     </div>
                 );
             
-            case 'join-team':
+            case 'team':
                 return (
                     <div className="space-y-6">
                         <h3 className="text-xl font-semibold">Join a Team</h3>
@@ -142,26 +225,41 @@ export default function HackathonTabs() {
                             <div className="bg-white border border-gray-200 rounded-xl p-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <h4 className="font-semibold text-lg">Browse Teams</h4>
-                                    <span className="text-sm text-gray-500">12 teams available</span>
+                                    <span className="text-sm text-gray-500">{teams.length} teams available</span>
                                 </div>
                                 <div className="space-y-4">
-                                    {[1, 2, 3].map((team) => (
-                                        <div key={team} className="p-4 border border-gray-200 rounded-lg hover:border-primary-300 transition-all duration-200">
+                                    {teams.map((team) => (
+                                        <div key={team.id} className="p-4 border border-gray-200 rounded-lg hover:border-primary-300 transition-all duration-200">
                                             <div className="flex justify-between items-start mb-2">
                                                 <div>
-                                                    <h5 className="font-medium">Team Alpha {team}</h5>
-                                                    <p className="text-sm text-gray-500">Looking for 2 more members</p>
+                                                    <h5 className="font-medium">{team.name}</h5>
+                                                    <p className="text-sm text-gray-500">
+                                                        {team.members?.length || 0} members 
+                                                    </p>
                                                 </div>
                                                 <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">Active</span>
                                             </div>
-                                            <div className="flex flex-wrap gap-1 mb-3">
-                                                <span className="text-xs bg-primary-100 text-primary-600 px-2 py-1 rounded">Frontend</span>
-                                                <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">Blockchain</span>
-                                                <span className="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded">Design</span>
-                                            </div>
-                                            <button className="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 rounded-lg transition-all duration-200">
-                                                Request to Join
-                                            </button>
+                                            {team.tagline && (
+                                                <p className="text-gray-600 text-sm mb-3">{team.tagline}</p>
+                                            )}
+                                            {/* <div className="flex flex-wrap gap-1 mb-3">
+                                                {team.requiredSkills?.map((skill, index) => (
+                                                    <span key={index} className="text-xs bg-primary-100 text-primary-600 px-2 py-1 rounded">
+                                                        {skill}
+                                                    </span>
+                                                )) || (
+                                                    <>
+                                                        <span className="text-xs bg-primary-100 text-primary-600 px-2 py-1 rounded">Frontend</span>
+                                                        <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">Blockchain</span>
+                                                    </>
+                                                )}
+                                            </div> */}
+                                            {user?.id == team.members[0].user.id && <button 
+                                                onClick={() => handleInviteClick(team)}
+                                                className="w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 rounded-lg transition-all duration-200"
+                                            >
+                                                Invite Member
+                                            </button>}
                                         </div>
                                     ))}
                                 </div>
@@ -172,7 +270,10 @@ export default function HackathonTabs() {
                                 <div className="bg-white border border-gray-200 rounded-xl p-6">
                                     <h4 className="font-semibold text-lg mb-4">Quick Actions</h4>
                                     <div className="space-y-3">
-                                        <button className="w-full flex items-center justify-between p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all duration-200">
+                                        <button 
+                                            onClick={() => router.push(`/hackathons/${id}/create-team`)} 
+                                            className="w-full flex items-center justify-between p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all duration-200"
+                                        >
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                                                     <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -189,7 +290,14 @@ export default function HackathonTabs() {
                                             </svg>
                                         </button>
                                         
-                                        <button className="w-full flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-all duration-200">
+                                        <button 
+                                            onClick={() => {
+                                                if (teams.length > 0) {
+                                                    handleInviteClick(teams[0]);
+                                                }
+                                            }}
+                                            className="w-full flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-all duration-200"
+                                        >
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                                                     <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -233,6 +341,95 @@ export default function HackathonTabs() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Modal d'invitation */}
+                        {showInviteModal && selectedTeam && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-xl font-semibold">Invite Member</h3>
+                                        <button 
+                                            onClick={() => setShowInviteModal(false)}
+                                            className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                                            disabled={isLoading}
+                                        >
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="mb-4 p-3 bg-purple-50 rounded-lg">
+                                        <p className="text-sm text-purple-700">
+                                            Inviting to team: <span className="font-semibold">{selectedTeam.name}</span>
+                                        </p>
+                                    </div>
+                                    
+                                    <form onSubmit={handleInviteSubmit}>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Email or Username
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={memberIdentifier}
+                                                    onChange={(e) => setMemberIdentifier(e.target.value)}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                    placeholder="Enter email address or username"
+                                                    required
+                                                    disabled={isLoading}
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    Enter the email address or username of the person you want to invite
+                                                </p>
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Message (Optional)
+                                                </label>
+                                                <textarea
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                    placeholder="Add a personal message..."
+                                                    rows={3}
+                                                    defaultValue="Join our team for the hackathon! We're looking for talented members to collaborate with."
+                                                    disabled={isLoading}
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex gap-3 mt-6">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowInviteModal(false)}
+                                                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-all duration-200 disabled:opacity-50"
+                                                disabled={isLoading}
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                className="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                disabled={isLoading}
+                                            >
+                                                {isLoading ? (
+                                                    <span className="flex items-center justify-center">
+                                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        Sending...
+                                                    </span>
+                                                ) : (
+                                                    'Send Invitation'
+                                                )}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 );
             
