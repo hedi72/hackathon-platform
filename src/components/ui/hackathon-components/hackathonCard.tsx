@@ -19,7 +19,6 @@ export default function HackathonCard({ className = "", hackathon }: HackathonCa
   
   return (
     <div
-    onClick={()=>{router.push(`/${hackathon.id}/create-team`)}}
       className={`bg-white border-[3px] border-[#18191F] shadow-[4px_4px_0px_#151528] rounded-xl p-6 flex flex-col justify-between text-left ${className}`}
     >
       <span

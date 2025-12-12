@@ -36,7 +36,7 @@ import HackathonCard from "@/src/components/ui/hackathon-components/hackathonCar
 import { Hackathon } from "@/src/components/ui/home-components/HackathonSection";
 import { getHackathons } from "@/src/api/hackathon/hackathons";
 import ButtonUI from "@/src/components/ui/button";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Event {
   id: string;
@@ -64,6 +64,8 @@ export default function EventsPage() {
     const [hackathons, setHackathons] = useState<Hackathon[]>([]);
      const searchParams = useSearchParams();
   const selectedCategory = searchParams.get("category");
+     const router = useRouter();
+  
   
     useEffect(() => {
       async function load() {
@@ -225,7 +227,7 @@ export default function EventsPage() {
                 Hackathons, and compete for amazing prizes.
               </p>
               <div className="flex items-center gap-3">
-                <Link href="/hackathons/create">
+                {/* <Link href="/hackathons/create">
                    <ButtonUI
                     size="md"
                     variant="primary"
@@ -234,7 +236,7 @@ export default function EventsPage() {
                   >
                     Create a hackathon 
                   </ButtonUI>
-                </Link>
+                </Link> */}
                 <Link href="/auth/signup">
                   <ButtonUI
                     size="md"
@@ -309,7 +311,13 @@ export default function EventsPage() {
         {/* Events Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {filteredHackathons.map((event) => (
-            <HackathonCard key={event.id} hackathon={event}></HackathonCard>
+              <div
+            key={event.id}
+            onClick={() => router.push(`/hackathons/${event.id}`)}
+            className="cursor-pointer"
+          >
+            <HackathonCard  key={event.id} hackathon={event}></HackathonCard>
+            </div>
             // <Card
             //   key={event.id}
             //   className="overflow-hidden hover:shadow-lg transition-shadow"
