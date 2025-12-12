@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getHackathonTeams } from "../api/team/getTeams";
+import TeamModal from "./TeamModal";
 
 
 export default function JoinTeamList({ hackathonId, token }) {
