@@ -33,14 +33,14 @@ export default function HackathonCard({ className = "", hackathon }: HackathonCa
       <h3 className="text-xl font-bold mt-3">{hackathon.title}</h3>
 
       <div className="mt-2 text-gray-600 text-sm space-y-1">
-        <div>📅 Starts: {new Date(hackathon.startDate || "").toLocaleDateString()}</div>
-        <div>🏷 Type: {hackathon.type}</div>
-        <div>🏢 Org: {hackathon.organization?.name}</div>
+        <div className="flex  "><img className="mr-1 w-4 h-4" src="/images/calendar.png" /> Starts: {new Date(hackathon.startDate || "").toLocaleDateString()}</div>
+        <div> Type: {hackathon.type}</div>
+        <div>Org: {hackathon.organization?.name}</div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-dashed border-gray-300 flex justify-between items-center">
         <span className="flex items-center gap-1 text-sm font-semibold">
-          🏆 Prize Pool
+          <img src="/images/prize.png"/> Prize Pool
         </span>
         <span className="text-primary-500 font-bold">
           {hackathon.prizePool} {hackathon.prizeToken}

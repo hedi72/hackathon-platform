@@ -17,7 +17,7 @@ export function Footer() {
           <div>
             {/* Logo */}
             <div className="mb-4">
-              <img src="/logo-hacks.svg" alt="Hacks Logo" className="h-8" />
+              <img src="/images/logo.png" alt="Hacks Logo" className="h-8" />
             </div>
 
             <p className="text-sm text-gray-700 leading-relaxed">
@@ -27,18 +27,10 @@ export function Footer() {
 
             {/* Social icons */}
             <div className="flex gap-3 mt-4">
-              <div className="p-2 rounded-lg border border-black/40 hover:bg-black hover:text-white transition cursor-pointer">
-                🐦
-              </div>
-              <div className="p-2 rounded-lg border border-black/40 hover:bg-black hover:text-white transition cursor-pointer">
-                🧑‍💻
-              </div>
-              <div className="p-2 rounded-lg border border-black/40 hover:bg-black hover:text-white transition cursor-pointer">
-                💼
-              </div>
-              <div className="p-2 rounded-lg border border-black/40 hover:bg-black hover:text-white transition cursor-pointer">
-                📷
-              </div>
+             <img src='/images/twitter-icon.png' />
+             <img src='/images/github-icon.png' />
+             <img src='/images/linkedin-icon.png' />
+             <img src='/images/youtube-icon.png' />
             </div>
           </div>
 
@@ -97,7 +89,7 @@ export function Footer() {
           </p>
 
           <div className="flex items-center text-sm text-gray-700">
-            Built with <span className="mx-1">🍊</span> by the community
+            Built with <img className='mx-2' src='/images/heart.png' /> by the community
           </div>
         </div>
       </div>

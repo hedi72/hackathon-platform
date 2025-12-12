@@ -32,6 +32,11 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import HackathonCard from "@/src/components/ui/hackathon-components/hackathonCard";
+import { Hackathon } from "@/src/components/ui/home-components/HackathonSection";
+import { getHackathons } from "@/src/api/hackathon/hackathons";
+import ButtonUI from "@/src/components/ui/button";
+import { useSearchParams } from "next/navigation";
 
 interface Event {
   id: string;
@@ -51,103 +56,42 @@ interface Event {
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [filteredHackathons, setFilteredHackathons] = useState<Hackathon[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Mock data - in a real app, this would come from an API
-    const mockEvents: Event[] = [
-      {
-        id: "1",
-        title: "Web3 Innovation Challenge",
-        description:
-          "Build the next generation of decentralized applications using cutting-edge blockchain technology.",
-        imageUrl:
-          "https://images.pexels.com/photos/3184296/pexels-photo-3184296.jpeg",
-        startDate: new Date("2025-02-15"),
-        endDate: new Date("2025-02-17"),
-        location: "San Francisco, CA",
-        isVirtual: false,
-        status: "UPCOMING",
-        participants: 234,
-        prizePool: 50000,
-        organizer: "TechCorp",
-        categories: ["Blockchain", "DeFi", "Web3"],
-      },
-      {
-        id: "2",
-        title: "AI for Good Hackathon",
-        description:
-          "Create AI solutions that address global challenges and make a positive impact on society.",
-        imageUrl:
-          "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg",
-        startDate: new Date("2025-03-01"),
-        endDate: new Date("2025-03-03"),
-        location: "Virtual Event",
-        isVirtual: true,
-        status: "UPCOMING",
-        participants: 156,
-        prizePool: 25000,
-        organizer: "AI Foundation",
-        categories: ["AI", "Machine Learning", "Social Impact"],
-      },
-      {
-        id: "3",
-        title: "Green Tech Challenge",
-        description:
-          "Develop sustainable technology solutions to combat climate change and environmental issues.",
-        imageUrl:
-          "https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg",
-        startDate: new Date("2025-01-20"),
-        endDate: new Date("2025-01-22"),
-        location: "Austin, TX",
-        isVirtual: false,
-        status: "ENDED",
-        participants: 189,
-        prizePool: 35000,
-        organizer: "EcoTech",
-        categories: ["Sustainability", "CleanTech", "IoT"],
-      },
-      {
-        id: "4",
-        title: "Mobile Innovation Summit",
-        description:
-          "Push the boundaries of mobile technology with innovative apps and cutting-edge features.",
-        imageUrl:
-          "https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg",
-        startDate: new Date("2025-01-10"),
-        endDate: new Date("2025-01-12"),
-        location: "Virtual Event",
-        isVirtual: true,
-        status: "ACTIVE",
-        participants: 312,
-        prizePool: 40000,
-        organizer: "MobileDev Inc",
-        categories: ["Mobile", "iOS", "Android"],
-      },
-    ];
+    const [hackathons, setHackathons] = useState<Hackathon[]>([]);
+     const searchParams = useSearchParams();
+  const selectedCategory = searchParams.get("category");
+  
+    useEffect(() => {
+      async function load() {
+        const res = await getHackathons({
+          page: 1,
+          limit: 10,
+          category: selectedCategory || undefined,
+        });
+  
+        setHackathons(res.data);
+        setFilteredHackathons(res.data);
+        setLoading(false);
+      }
+  
+      load();
+    }, []);
 
-    setTimeout(() => {
-      setEvents(mockEvents);
-      setFilteredEvents(mockEvents);
-      setLoading(false);
-    }, 1000);
-  }, []);
 
   useEffect(() => {
-    let filtered = events;
+    let filtered = hackathons;
 
     // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(
         (event) =>
           event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          event.categories.some((cat) =>
-            cat.toLowerCase().includes(searchTerm.toLowerCase())
-          )
+          event.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          event?.category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -158,8 +102,8 @@ export default function EventsPage() {
       );
     }
 
-    setFilteredEvents(filtered);
-  }, [searchTerm, statusFilter, events]);
+    setFilteredHackathons(filtered);
+  }, [searchTerm, statusFilter, hackathons]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -282,14 +226,24 @@ export default function EventsPage() {
               </p>
               <div className="flex items-center gap-3">
                 <Link href="/hackathons/create">
-                  <Button className="bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700">
-                    Create a Hackathon
-                  </Button>
+                   <ButtonUI
+                    size="md"
+                    variant="primary"
+                    withShadow
+                    className="inline-flex items-center gap-2"
+                  >
+                    Create a hackathon 
+                  </ButtonUI>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button className="bg-white text-purple-700 font-semibold shadow-md hover:bg-purple-600 hover:text-white">
+                  <ButtonUI
+                    size="md"
+                    variant="outline"
+                    withShadow
+                    className="inline-flex items-center gap-2"
+                  >
                     View Guide
-                  </Button>
+                  </ButtonUI>
                 </Link>
               </div>
             </div>
@@ -354,71 +308,72 @@ export default function EventsPage() {
 
         {/* Events Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {filteredEvents.map((event) => (
-            <Card
-              key={event.id}
-              className="overflow-hidden hover:shadow-lg transition-shadow"
-            >
-              <div className="aspect-video bg-gray-200">
-                <img
-                  src={event.imageUrl}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <Badge className={getStatusColor(event.status)}>
-                    {event.status}
-                  </Badge>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Trophy className="h-4 w-4 mr-1" />$
-                    {(event.prizePool / 1000).toFixed(0)}K
-                  </div>
-                </div>
-                <CardTitle className="text-lg">{event.title}</CardTitle>
-                <CardDescription className="line-clamp-2">
-                  {event.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  {event.startDate.toLocaleDateString()} -{" "}
-                  {event.endDate.toLocaleDateString()}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  {event.isVirtual ? "Virtual Event" : event.location}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Users className="h-4 w-4 mr-2" />
-                  {event.participants} participants
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {event.categories.slice(0, 3).map((category) => (
-                    <Badge
-                      key={category}
-                      variant="secondary"
-                      className="text-xs"
-                    >
-                      {category}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Link href={`/events/${event.id}`} className="w-full">
-                  <Button className="w-full">
-                    {event.status === "ACTIVE" ? "Join Now" : "View Details"}
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
+          {filteredHackathons.map((event) => (
+            <HackathonCard key={event.id} hackathon={event}></HackathonCard>
+            // <Card
+            //   key={event.id}
+            //   className="overflow-hidden hover:shadow-lg transition-shadow"
+            // >
+            //   <div className="aspect-video bg-gray-200">
+            //     <img
+            //       src={event.imageUrl}
+            //       alt={event.title}
+            //       className="w-full h-full object-cover"
+            //     />
+            //   </div>
+            //   <CardHeader>
+            //     <div className="flex items-center justify-between mb-2">
+            //       <Badge className={getStatusColor(event.status)}>
+            //         {event.status}
+            //       </Badge>
+            //       <div className="flex items-center text-sm text-gray-600">
+            //         <Trophy className="h-4 w-4 mr-1" />$
+            //         {(event.prizePool / 1000).toFixed(0)}K
+            //       </div>
+            //     </div>
+            //     <CardTitle className="text-lg">{event.title}</CardTitle>
+            //     <CardDescription className="line-clamp-2">
+            //       {event.description}
+            //     </CardDescription>
+            //   </CardHeader>
+            //   <CardContent className="space-y-3">
+            //     <div className="flex items-center text-sm text-gray-600">
+            //       <Calendar className="h-4 w-4 mr-2" />
+            //       {event.startDate.toLocaleDateString()} -{" "}
+            //       {event.endDate.toLocaleDateString()}
+            //     </div>
+            //     <div className="flex items-center text-sm text-gray-600">
+            //       <MapPin className="h-4 w-4 mr-2" />
+            //       {event.isVirtual ? "Virtual Event" : event.location}
+            //     </div>
+            //     <div className="flex items-center text-sm text-gray-600">
+            //       <Users className="h-4 w-4 mr-2" />
+            //       {event.participants} participants
+            //     </div>
+            //     <div className="flex flex-wrap gap-1">
+            //       {event.categories.slice(0, 3).map((category) => (
+            //         <Badge
+            //           key={category}
+            //           variant="secondary"
+            //           className="text-xs"
+            //         >
+            //           {category}
+            //         </Badge>
+            //       ))}
+            //     </div>
+            //   </CardContent>
+            //   <CardFooter>
+            //     <Link href={`/events/${event.id}`} className="w-full">
+            //       <Button className="w-full">
+            //         {event.status === "ACTIVE" ? "Join Now" : "View Details"}
+            //       </Button>
+            //     </Link>
+            //   </CardFooter>
+            // </Card>
           ))}
         </div>
 
-        {filteredEvents.length === 0 && !loading && (
+        {/* {filteredEvents.length === 0 && !loading && (
           <div className="text-center py-12">
             <Calendar className="h-16 w-16 mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -433,7 +388,7 @@ export default function EventsPage() {
               <Link href="/organize">Host Your Own Event</Link>
             </Button>
           </div>
-        )}
+        )} */}
       </div>
 
       <Footer />

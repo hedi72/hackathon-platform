@@ -46,20 +46,6 @@ export default function HackathonsSection() {
         limit: 10,
       });
 
-      const mapped = res.data.map((h: any) => ({
-        id: h.id,
-        title: h.title,
-        status: h.status === "ACTIVE" ? "Open" : "Coming Soon",
-        date: new Date(h.startDate).toLocaleDateString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        }),
-        location: h.type === "ONLINE" ? "Online" : h.organization?.name ?? "Unknown",
-        participants: "N/A",
-        prize: `$${h.prizePool?.toLocaleString() ?? 0}`,
-      }));
-
       setHackathons(res.data);
     }
 
@@ -85,7 +71,7 @@ export default function HackathonsSection() {
           </p>
         </div>
 
-        <ButtonUI variant="outline" size="sm" withShadow>
+        <ButtonUI variant="outline" size="sm" withShadow onClick={()=>router.push('/hackathons')}>
           View All →
         </ButtonUI>
       </div>
@@ -94,10 +80,10 @@ export default function HackathonsSection() {
 
         {hackathons.map((hackathon) => (
           <div
-  key={hackathon.id}
-  onClick={() => router.push(`/hackathons/${hackathon.id}`)}
-  className="cursor-pointer"
->
+            key={hackathon.id}
+            onClick={() => router.push(`/hackathons/${hackathon.id}`)}
+            className="cursor-pointer"
+          >
           <HackathonCard key={hackathon.id} hackathon={hackathon} />
           </div>
         ))}

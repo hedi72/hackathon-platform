@@ -1,25 +1,40 @@
-// import { useSession } from 'next-auth/react'
-import { useEffect } from 'react'
-import { useAuthStore } from '../store/auth'
+import { useEffect, useState } from "react";
+import { useAuthStore } from "../store/auth";
+import { getCurrentUser } from "@/app/api/auth/getCurrentUser";
 
 export function useAuth() {
-  // const { data: session, status } = useSession()
-  const { user, isLoading, setUser, setLoading, updateUserImage } = useAuthStore()
+  const { user, isLoading, setUser, setLoading, updateUserImage } = useAuthStore();
+
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    if (status === 'loading') {
-      setLoading(true)
-    } else {
-      setLoading(false)
-      // setUser(session?.user as any || null)
-    }
-  }, [ status, setUser, setLoading])
+    const t = localStorage.getItem("token");
+    setToken(t);
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const loadUser = async () => {
+      setLoading(true);
+      try {
+        const res = await getCurrentUser(token)
+        setUser(res);
+      } catch (err) {
+        console.error("Failed to load user", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, [token, setUser, setLoading]);
 
   return {
     user,
-    isLoading: status === 'loading' || isLoading,
-     isAuthenticated: false,
-    // session,
+    token,
+    isLoading,
+    isAuthenticated: Boolean(token),
     updateUserImage,
-  }
+  };
 }

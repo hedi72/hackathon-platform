@@ -9,7 +9,7 @@ export default function HeroSection() {
       <ButtonUI  size="md"
           variant="rounded"
           withShadow
-          className="inline-flex items-center gap-2">⭐ The #1 Web3 Learning Platform</ButtonUI>  
+          className="inline-flex items-center gap-2"><img src="/images/star.png"/> The #1 Web3 Learning Platform</ButtonUI>  
      
 
       {/* Title */}

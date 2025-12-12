@@ -31,16 +31,16 @@ export default function CertificationSection() {
             {/* Features */}
             <div className="grid grid-cols-2 gap-4 mt-6 text-sm font-bold">
               <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4" /> Self-paced
+                <img src="/images/self-paced.png" className="w-8 h-8" /> Self-paced
               </div>
               <div className="flex items-center gap-2">
-                <Star className="w-4 h-4" /> Industry Recognized
+                <img src="/images/industry-recognized.png" className="w-8 h-8" /> Industry Recognized
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" /> 10K+ Certified
+                <img src="/images/members.png" className="w-8 h-8" /> 10K+ Certified
               </div>
               <div className="flex items-center gap-2">
-                <Award className="w-4 h-4" /> Free Certificate
+                <img src="/images/certificat.png" className="w-8 h-8" /> Free Certificate
               </div>
             </div>
 
@@ -59,16 +59,7 @@ export default function CertificationSection() {
 
           {/* Decorative Graphic */}
           <div className="flex items-center justify-center">
-            <div className="relative">
-              <div className="w-48 h-48 rounded-full border-[8px] border-red-500 flex items-center justify-center">
-                <div className="w-32 h-32 bg-white rounded-full border-[3px] border-[#18191F] flex items-center justify-center">
-                  <Award className="w-8 h-8 text-red-500" />
-                </div>
-              </div>
-
-              <div className="absolute w-6 h-6 bg-yellow-300 rounded-full top-2 right-2"></div>
-              <div className="absolute w-6 h-6 bg-green-400 rounded-full bottom-3 left-3"></div>
-            </div>
+            <img src="/images/certified.png" />
           </div>
         </div>
 

@@ -28,6 +28,7 @@ export function Navbar() {
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true)
 
   useEffect(() => {
+    console.log('User authentication status:', isAuthenticated)
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768)
     }
@@ -82,7 +83,7 @@ export function Navbar() {
             className="flex items-center space-x-3 transform hover:scale-105 transition-transform duration-300"
           >
             <div className="w-10 h-10 flex items-center justify-center">
-              <span className="text-black font-bold text-lg">4Hacks</span>
+              <img src='/images/logo-small.png'/>
             </div>
             <span className="text-white text-xl font-extrabold tracking-wide">
               
@@ -113,17 +114,17 @@ export function Navbar() {
                     {/* Navigation Icons */}
                     <div className="flex items-center space-x-3">
                       {/* Search Icon */}
-                      <button className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
+                      {/* <button className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
                         <Search className="w-5 h-5 text-white/80 group-hover:text-yellow-400 transition-colors" />
-                      </button>
+                      </button> */}
                       
                       {/* Mail Icon */}
-                      <button className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
+                      {/* <button className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
                         <Mail className="w-5 h-5 text-white/80 group-hover:text-yellow-400 transition-colors" />
-                      </button>
+                      </button> */}
                       
                       {/* Plus Icon with Dropdown */}
-                      <DropdownMenu>
+                      {/* <DropdownMenu>
                         <DropdownMenuTrigger className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
                           <Plus className="w-5 h-5 text-white/80 group-hover:text-yellow-400 transition-colors" />
                         </DropdownMenuTrigger>
@@ -147,10 +148,10 @@ export function Navbar() {
                             </div>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
-                      </DropdownMenu>
+                      </DropdownMenu> */}
                       
                       {/* Help Icon with Dropdown */}
-                      <DropdownMenu>
+                      {/* <DropdownMenu>
                         <DropdownMenuTrigger className="group p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
                           <HelpCircle className="w-5 h-5 text-white/80 group-hover:text-yellow-400 transition-colors" />
                         </DropdownMenuTrigger>
@@ -171,17 +172,17 @@ export function Navbar() {
                             </div>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
-                      </DropdownMenu>
+                      </DropdownMenu> */}
                     </div>
                     
                     {/* Notifications */}
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="relative p-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
+                      <DropdownMenuTrigger className="relative p-2 bg-white backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105">
                         <Bell className="w-5 h-5 text-white/80 hover:text-yellow-400 transition-colors" />
                         
-                        {hasUnreadNotifications && (
+                        {/* {hasUnreadNotifications && (
                           <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-white"></div>
-                        )}
+                        )} */}
                       </DropdownMenuTrigger>
                       
                       <DropdownMenuContent align="end" className="w-96 bg-white shadow-2xl rounded-xl p-0 border">
@@ -256,12 +257,12 @@ export function Navbar() {
                   </>
                 ) : (
                   <div className="flex items-center gap-3">
-                    <Link href="/auth/signin">
+                    <Link href="/log/signin">
                       <Button className=" text-black font-semibold bg-transparent">
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/auth/signup">
+                    <Link href="/log/signup">
                      <ButtonUI size="md" variant="primary" withShadow>
                         Sign Up
                       </ButtonUI>
@@ -308,12 +309,12 @@ export function Navbar() {
 
                 {!isAuthenticated && (
                   <div className="pt-4 mt-4 border-t border-white/30 space-y-3">
-                    <Link href="/auth/signin" onClick={closeMobileMenu}>
-                      <Button className="w-full bg-purple-600 text-white font-semibold hover:bg-purple-700">
+                    <Link href="/log/signin" onClick={closeMobileMenu}>
+                      <Button className=" text-black font-semibold bg-transparent">
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/auth/signup" onClick={closeMobileMenu}>
+                    <Link href="/log/signup" onClick={closeMobileMenu}>
                       <Button className="w-full bg-yellow-400 text-purple-700 font-semibold hover:bg-yellow-500 hover:text-white">
                         Sign Up
                       </Button>

@@ -15,17 +15,17 @@ export default function JoinCommunitySection() {
         {/* Stats */}
         <div className="flex flex-wrap justify-center gap-4 mt-8">
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1A1A22] border border-[#2A2A33] text-sm">
-            <span>👥</span>
+            <img src="/images/member.png"/> 
             <span>50K+ Members</span>
           </div>
 
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1A1A22] border border-[#2A2A33] text-sm">
-            <span>🌐</span>
+            <img src="/images/countries.png" />
             <span>120+ Countries</span>
           </div>
 
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1A1A22] border border-[#2A2A33] text-sm">
-            <span>💬</span>
+            <img src="/images/support.png" />
             <span>24/7 Support</span>
           </div>
         </div>

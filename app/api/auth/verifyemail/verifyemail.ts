@@ -1,4 +1,4 @@
-import { BASE_URL } from "../../config/apiConfig";
+import { BASE_URL } from "@/src/api/config/apiConfig";
 import { checkAndRefreshToken } from "../checkAndRefreshToken";
 export interface VerifyInput {
   code: number;

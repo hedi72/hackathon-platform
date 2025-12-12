@@ -1,6 +1,8 @@
 "use client";
 import { useCategories } from "@/src/hooks/useCategories";
 import { Code2, Shield, Layers, Wrench, Gamepad2, Coins } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // Local mapping between category name → icon + color
 const categoryIconMap: Record<
@@ -22,9 +24,12 @@ const defaultCategoryStyle = {
 };
 
 export default function ExploreCategories() {
-  const { categories, loadingCategories, errorLoadingCategories } =
-    useCategories();
-
+  const { categories, loadingCategories, errorLoadingCategories } = useCategories();
+  const router = useRouter();
+  const handleCategoryClick = ( name: string ) => {
+    router.push(`/hackathons?category=${encodeURIComponent(name)}`);
+  };
+  
   return (
     <section className="py-20 bg-[#f4f2ef] text-center border-t-4 border-b-4 border-black mt-10">
       <span className="px-3 py-1 rounded-lg text-xs bg-green-500 font-semibold border-2 border-black">
@@ -41,6 +46,7 @@ export default function ExploreCategories() {
 
           return (
             <div
+              onClick={() => handleCategoryClick(cat.name)}
               key={cat.name}
               className={`flex items-center gap-2 px-4 py-2 border-[3px] border-[#18191F] shadow-[4px_4px_0px_#151528] rounded-xl ${match.color} cursor-pointer hover:scale-105 transition`}
             >

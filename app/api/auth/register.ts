@@ -1,4 +1,4 @@
-import { BASE_URL } from "../config/apiConfig";
+import { BASE_URL } from "@/src/api/config/apiConfig";
 
 
 export interface RegisterInput {
