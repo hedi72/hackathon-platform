@@ -47,7 +47,7 @@ export default function HackathonTabs() {
                     <div className="space-y-4">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-semibold">BUIDLs</h3>
-                            <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200">
+                            <button className="bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200">
                                 Submit BUIDL
                             </button>
                         </div>
@@ -64,7 +64,7 @@ export default function HackathonTabs() {
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm text-gray-500">by Team Crypto</span>
                                         <div className="flex gap-2">
-                                            <span className="text-sm bg-blue-100 text-blue-600 px-2 py-1 rounded">Web3</span>
+                                            <span className="text-sm bg-primary-100 text-primary-600 px-2 py-1 rounded">Web3</span>
                                             <span className="text-sm bg-green-100 text-green-600 px-2 py-1 rounded">DeFi</span>
                                         </div>
                                     </div>
@@ -93,8 +93,8 @@ export default function HackathonTabs() {
                             {[1, 2, 3, 4, 5, 6].map((item) => (
                                 <div key={item} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                     <div className="flex items-center gap-3 mb-3">
-                                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <span className="font-semibold text-blue-600">U{item}</span>
+                                        <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                                            <span className="font-semibold text-primary-600">U{item}</span>
                                         </div>
                                         <div>
                                             <h4 className="font-semibold">User {item}</h4>
@@ -106,7 +106,7 @@ export default function HackathonTabs() {
                                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Node.js</span>
                                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Solidity</span>
                                     </div>
-                                    <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition-all duration-200 text-sm">
+                                    <button className="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 rounded-lg transition-all duration-200 text-sm">
                                         Connect
                                     </button>
                                 </div>
@@ -120,16 +120,16 @@ export default function HackathonTabs() {
                     <div className="space-y-6">
                         <h3 className="text-xl font-semibold">Join a Team</h3>
                         
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-6">
                             <div className="flex items-start gap-3">
-                                <div className="text-blue-600 mt-1">
+                                <div className="text-primary-600 mt-1">
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <h4 className="font-medium text-blue-800 mb-1">Find Your Perfect Team</h4>
-                                    <p className="text-blue-700 text-sm">
+                                    <h4 className="font-medium text-primary-800 mb-1">Find Your Perfect Team</h4>
+                                    <p className="text-primary-700 text-sm">
                                         Browse teams looking for members or create your own team. 
                                         Make sure to check team requirements and available spots.
                                     </p>
@@ -146,7 +146,7 @@ export default function HackathonTabs() {
                                 </div>
                                 <div className="space-y-4">
                                     {[1, 2, 3].map((team) => (
-                                        <div key={team} className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-all duration-200">
+                                        <div key={team} className="p-4 border border-gray-200 rounded-lg hover:border-primary-300 transition-all duration-200">
                                             <div className="flex justify-between items-start mb-2">
                                                 <div>
                                                     <h5 className="font-medium">Team Alpha {team}</h5>
@@ -155,11 +155,11 @@ export default function HackathonTabs() {
                                                 <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">Active</span>
                                             </div>
                                             <div className="flex flex-wrap gap-1 mb-3">
-                                                <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">Frontend</span>
+                                                <span className="text-xs bg-primary-100 text-primary-600 px-2 py-1 rounded">Frontend</span>
                                                 <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">Blockchain</span>
                                                 <span className="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded">Design</span>
                                             </div>
-                                            <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition-all duration-200">
+                                            <button className="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 rounded-lg transition-all duration-200">
                                                 Request to Join
                                             </button>
                                         </div>
@@ -274,7 +274,7 @@ export default function HackathonTabs() {
                             onClick={() => setActiveTab(tab.id)}
                             className={`mr-8 py-4 px-1 border-b-2 font-medium transition-all duration-200 ${
                                 activeTab === tab.id
-                                    ? 'border-blue-500 text-blue-600'
+                                    ? 'border-primary-500 text-primary-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             }`}
                         >
