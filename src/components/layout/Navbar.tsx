@@ -431,12 +431,12 @@ export function Navbar() {
                   </>
                 ) : (
                   <div className="flex items-center gap-3">
-                    <Link href="/log/signin">
+                    <Link href="/auth/signin">
                       <Button className=" text-black font-semibold bg-transparent">
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/log/signup">
+                    <Link href="/auth/signup">
                      <ButtonUI size="md" variant="primary" withShadow>
                         Sign Up
                       </ButtonUI>
@@ -553,12 +553,12 @@ export function Navbar() {
 
                 {!isAuthenticated && (
                   <div className="pt-4 mt-4 border-t border-white/30 space-y-3">
-                    <Link href="/log/signin" onClick={closeMobileMenu}>
+                    <Link href="/auth/signin" onClick={closeMobileMenu}>
                       <Button className=" text-black font-semibold bg-transparent">
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/log/signup" onClick={closeMobileMenu}>
+                    <Link href="/auth/signup" onClick={closeMobileMenu}>
                       <Button className="w-full bg-yellow-400 text-purple-700 font-semibold hover:bg-yellow-500 hover:text-white">
                         Sign Up
                       </Button>

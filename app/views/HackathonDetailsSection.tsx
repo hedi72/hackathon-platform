@@ -7,6 +7,7 @@ import HackersList from "./HackersList";
 import { useToken } from "../context/TokenContext";
 import JoinTeamList from "./JoinTeamsList";
 import TracksList from "./TracksList";
+import InviteMemberToTeam from "./InviteMembertoTeam";
 
 export default function HackathonDetailsSection({ hackathon }) {
   const [activeTab, setActiveTab] = useState("details");
@@ -48,6 +49,16 @@ export default function HackathonDetailsSection({ hackathon }) {
   }
 >
   Join a Team
+</button>
+   <button
+  onClick={() => setActiveTab("invite-member-teams")}
+  className={
+    activeTab === "invite-member-teams"
+      ? "text-orange-500 border-b-2 border-orange-500 pb-2"
+      : "pb-2 hover:text-gray-700"
+  }
+>
+Team
 </button>
 
              <button
@@ -140,6 +151,9 @@ export default function HackathonDetailsSection({ hackathon }) {
 
         {activeTab === "teams" && (
              <JoinTeamList hackathonId={hackathon?.id} token={token} />
+)}
+  {activeTab === "invite-member-teams" && (
+             <InviteMemberToTeam />
 )}
 
 {activeTab === "tracks" && (
