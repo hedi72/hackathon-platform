@@ -1,32 +1,21 @@
-import { withAuth } from "next-auth/middleware"
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token
-    const isAuth = !!token
-    const isAuthPage = req.nextUrl.pathname.startsWith('/auth')
+export function middleware(req) {
+  const token = req.cookies.get("token")?.value;  
+  const isAuth = !!token;
+  const isAuthPage = req.nextUrl.pathname.startsWith('/auth');
 
-    if (isAuthPage) {
-      if (isAuth) {
-        // If user is authenticated and tries to access auth pages, redirect to dashboard
-        return NextResponse.redirect(new URL('/dashboard', req.url))
-      }
-      return null
-    }
-
-    if (!isAuth && req.nextUrl.pathname.startsWith('/dashboard')) {
-      // If user is not authenticated and tries to access protected pages, redirect to signin
-      return NextResponse.redirect(new URL('/auth/signin', req.url))
-    }
-  },
-  {
-    callbacks: {
-      authorized: () => true, // Let the middleware function handle authorization
-    },
+  if (isAuthPage && isAuth) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
-)
+
+  if (!isAuth && req.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/auth/login', req.url));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: ['/auth/:path*', '/dashboard/:path*', '/events/:path*']
-}
+};

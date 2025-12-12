@@ -14,7 +14,9 @@ export default function HackathonInfoCard({ hackathon }) {
     type,
     tags = [],
     organization,
+    title
   } = hackathon;
+
 
   return (
     <div className="bg-white rounded-xl shadow p-8 space-y-8 border border-gray-100">
@@ -32,26 +34,29 @@ export default function HackathonInfoCard({ hackathon }) {
 
       <hr className="border-gray-200" />
 
-      {/* EVENT TIMELINE */}
+      {/* Timeline */}
       <div>
         <p className="text-gray-600 font-semibold text-sm flex items-center gap-2">
           <span>📅</span> EVENT TIMELINE
         </p>
 
         <ul className="mt-4 space-y-2 text-sm">
-          {/* Registration */}
           <li className="flex justify-between text-gray-700">
             <span>Registration</span>
-            <span>{new Date(registrationStart).toLocaleDateString()} → {new Date(registrationEnd).toLocaleDateString()}</span>
+            <span>
+              {new Date(registrationStart).toLocaleDateString()} →{" "}
+              {new Date(registrationEnd).toLocaleDateString()}
+            </span>
           </li>
 
-          {/* Event Duration */}
           <li className="flex justify-between text-gray-700">
             <span>Event Period</span>
-            <span>{new Date(startDate).toLocaleDateString()} → {new Date(endDate).toLocaleDateString()}</span>
+            <span>
+              {new Date(startDate).toLocaleDateString()} →{" "}
+              {new Date(endDate).toLocaleDateString()}
+            </span>
           </li>
 
-          {/* Status */}
           <li className="flex justify-between font-semibold">
             <span>Status</span>
             <span className={status === "ACTIVE" ? "text-green-500" : "text-gray-500"}>
@@ -61,13 +66,13 @@ export default function HackathonInfoCard({ hackathon }) {
         </ul>
       </div>
 
-      {/* Virtual / In-Person */}
+      {/* Virtual / In-person */}
       <div className="flex items-center gap-2 text-gray-700 text-sm">
         <FiGlobe className="text-gray-600" />
         {type === "ONLINE" ? "Virtual" : "In-person"}
       </div>
 
-      {/* HACKATHON TAGS */}
+      {/* Tags */}
       <div>
         <p className="text-gray-600 uppercase text-sm font-semibold flex gap-2">
           <span>🏷️</span> HACKATHON TAGS
@@ -89,12 +94,11 @@ export default function HackathonInfoCard({ hackathon }) {
         </div>
       </div>
 
-      {/* WEB3 ECOSYSTEM */}
+      {/* Organization */}
       <div>
         <p className="text-gray-600 uppercase text-sm font-semibold flex gap-2">
           <span>🌐</span> ORGANIZATION
         </p>
-
         <p className="mt-2 text-sm text-gray-700">
           {organization?.name || "Unknown"}
         </p>
@@ -102,11 +106,11 @@ export default function HackathonInfoCard({ hackathon }) {
 
       <hr className="border-gray-200" />
 
-      {/* FOOTER */}
+      {/* Footer */}
       <div className="flex justify-between items-center">
         <div className="font-medium flex items-center gap-2">
           <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-md text-xs">#</span>
-          {hackathon.title}
+          {title}
         </div>
 
         <button className="flex items-center gap-2 border px-4 py-2 rounded-lg hover:bg-gray-50 transition">

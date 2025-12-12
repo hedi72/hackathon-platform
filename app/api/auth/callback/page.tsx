@@ -26,12 +26,12 @@ export  function GithubCallbackPage() {
           router.push("/");
         } else {
           console.warn("⚠️ No user returned from /auth/me");
-          router.push("/signin");
+          router.push("/auth/signin");
         }
       });
     } else {
       console.error("❌ No token found in callback URL");
-      router.push("/signin");
+      router.push("/auth/signin");
     }
   }, [params, router]);
 
@@ -69,12 +69,12 @@ export  function GoogleCallbackPage() {
         router.push("/");
       } else {
         console.warn("⚠️ No user returned from /auth/me");
-        router.push("/signin");
+        router.push("/auth/signin");
       }
     });
   } else {
     console.error("❌ No token found in URL or localStorage");
-    router.push("/signin");
+    router.push("/auth/signin");
   }
 }, [params, router]);
 
@@ -106,12 +106,12 @@ export default function LinkedinCallbackPage() {
           router.push("/");
         } else {
           console.warn("⚠️ No user returned from /auth/me");
-          router.push("/signin");
+          router.push("/auth/signin");
         }
       });
     } else {
       console.error("❌ No token found in LinkedIn callback URL");
-      router.push("/signin");
+      router.push("/auth/signin");
     }
   }, [params, router]);
 

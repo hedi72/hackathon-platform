@@ -21,13 +21,12 @@ export interface HackathonDetails {
 export async function getHackathonDetails(identifier: string): Promise<HackathonDetails> {
   try {
     const url = `${BASE_URL}/hackathon/${identifier}`;
+    console.log("Fetching Hackathon Details from URL:", url);
 
     const res = await fetch(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store", // ensures always fresh
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
     });
 
     if (!res.ok) {

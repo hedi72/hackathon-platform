@@ -1,205 +1,329 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Github, Mail, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { Navbar } from '@/src/components/layout/Navbar'
 
-const images = [
-  "/images/signin-art.png",
-]
+// import {  EyeCloseIcon, EyeIcon } from "@/icons";
+import Link from "next/link";
+import React, { useState } from "react";
+import { HiArrowLeft } from "react-icons/hi";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub, FaEnvelope,FaLinkedinIn } from "react-icons/fa";
+import { FiLock } from "react-icons/fi";
+// import  svgPaths  from "@/components/imports/svg-50utk87dgi";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginUser } from "@/app/api/auth/login/page";
+import { loginWithGithub } from "@/app/api/auth/login/loginWithGithub";
+// import Alert from "../ui/alert/Alert";
+import { loginWithLinkedin } from "@/app/api/auth/login/loginWithLinkedin";
+import { useRouter } from "next/navigation";
 
-export default function SignInPage() {
-  const [githubLoading, setGithubLoading] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [index, setIndex] = useState(0)
-  
-  const isGithubEnabled = process.env.NEXT_PUBLIC_GITHUB_ENABLED === 'true'
+import { loginWithGoogle } from "@/app/api/auth/login/loginWithGoogle";
+import { getCurrentUser } from "@/app/api/auth/getCurrentUser";
 
-  const router = useRouter()
+import { useToken } from "@/app/context/TokenContext";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { useUser } from "@/app/context/UserContext";
 
-  // rotation auto toutes les 4s - désactivée avec une seule image
-  // useEffect(() => {
-  //   if (images.length > 1) {
-  //     const interval = setInterval(() => {
-  //       setIndex((prev) => (prev + 1) % images.length)
-  //     }, 4000)
-  //     return () => clearInterval(interval)
-  //   }
-  // }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+const SignInSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  rememberMe: z.boolean().optional(),
+});
 
-    try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      })
+type SignInData = z.infer<typeof SignInSchema>;
 
-      if (result?.error) {
-        toast.error('Invalid credentials. Please try again.')
-      } else {
-        toast.success('Welcome back!')
-        // Use replace for faster redirection without history entry
-        router.replace('/dashboard')
-      }
-    } catch (error) {
-      toast.error('Something went wrong. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+export default function SignInForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+   const { setUser } = useUser();
+     const {token, setToken} = useToken();
+  const [alert, setAlert] = useState<{
+  variant: "success" | "error" | "warning" | "info";
+  title: string;
+  message: string;
+} | null>(null);
 
-  const handleGithubSignIn = async () => {
-    // Vérifier si GitHub est configuré
-    if (!isGithubEnabled) {
-      toast.error('GitHub authentication is not configured. Please contact the administrator or use email/password.')
-      return
-    }
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<SignInData>({
+    resolver: zodResolver(SignInSchema),
+    mode: "onChange",
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+    },
+  });
+
+  const rememberValue = watch("rememberMe");
+
+const onSubmit = async (data: SignInData) => {
+  console.log("🔐 Attempting login with data:", data);
+  try {
+    const res = await loginUser({
+      identifier: data.email,
+      password: data.password,
+    });
+
+    const token = res?.token;
+    console.log("🔑 Token:", token);
+
+    const user = await getCurrentUser(token);
+    if (!user) throw new Error("Unauthorized");
+
+       if (token) {
+  localStorage.setItem("token", token);
+  setToken(token);
+} else {
+  console.error("No token returned from login");
+}
+    localStorage.setItem("user", JSON.stringify(user));
+     localStorage.setItem("name", user.username || "");
+
+   setAlert({
+      variant: "success",
+      title: "Login Successful",
+      message: "Redirecting to your dashboard...",
+    });
     
-    setGithubLoading(true)
-    try {
-      const result = await signIn('github', { 
-        callbackUrl: '/dashboard',
-        redirect: false // Change to false to handle errors properly
-      })
-      
-      if (result?.error) {
-        console.error('GitHub signin error:', result.error)
-        if (result.error === 'OAuthCallback') {
-          toast.error('GitHub authentication failed. Please check your configuration or try again.')
-        } else if (result.error === 'AccessDenied') {
-          toast.error('Access denied. Please make sure your email is public on GitHub.')
-        } else {
-          toast.error('Failed to sign in with GitHub. Please try again or use email/password.')
-        }
-      } else if (result?.ok) {
-        toast.success('Welcome! Redirecting to dashboard...')
-        router.push('/dashboard')
-      }
-    } catch (error) {
-      console.error('GitHub signin error:', error)
-      toast.error('An unexpected error occurred. Please try again.')
-    } finally {
-      setGithubLoading(false)
-    }
+    console.log("✅ Logged in user:", user);
+   
+      router.push("/");
+    
+
+    
+  } catch (error: any) {
+
+     console.error("❌ Login error:", error);
+     
+     setAlert({
+      variant: "error",
+      title: "Login Failed",
+      message: error.message || "Invalid credentials or network error.",
+    });
+   
   }
+};
+
+
+
 
   return (
-    <>
-      <Navbar />
+    <div className="min-h-screen flex flex-col items-center px-4">
+      <div className="w-full max-w-md mb-4">
+        <Link
+          href="/"
+         className="inline-flex items-center text-sm text-black hover:text-black mt-12"
+    >
+      <HiArrowLeft className="w-4 h-4" />
 
-      <div className="min-h-screen flex flex-col md:flex-row items-stretch justify-center bg-gray-50">
-        {/* Colonne avec carrousel */}
-        <div className="hidden md:flex flex-1 items-center justify-center relative overflow-hidden ">
-          <AnimatePresence>
-            <motion.img
-              key={index}
-              src={images[index]}
-              alt={`Carousel ${index}`}
-              className="absolute inset-0 w-full h-full object-cover"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-            />
-          </AnimatePresence>
-          {/* Overlay dégradé */}
-          {/* <div className="absolute inset-0 "  /> */}
-        </div>
+          Back to dashboard
+        </Link>
+    </div>
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 
+  shadow-lg dark:shadow-[0_0_15px_rgba(0,0,0,0.6)] 
+  rounded-2xl p-8 transition-colors">
 
-        {/* Colonne formulaire */}
-        <div className="flex-1 flex items-center justify-center">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg mx-auto mb-4" />
-              <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-              <CardDescription>
-                Sign in to your account to continue building amazing projects
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button
-                variant="outline"
-                className={`w-full ${!isGithubEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                onClick={handleGithubSignIn}
-                disabled={githubLoading || !isGithubEnabled}
-                title={!isGithubEnabled ? 'GitHub authentication not configured' : 'Sign in with GitHub'}
-              >
-                {githubLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Github className="mr-2 h-4 w-4" />
-                )}
-                {!isGithubEnabled ? 'GitHub (Not Configured)' : 'Continue with GitHub'}
-              </Button>
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <Separator />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-muted-foreground">
-                    Or continue with
-                  </span>
-                </div>
+
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center gap-2.5 mb-8">
+              <div className="relative h-10 w-10">
+                {/* <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 40 40">
+                   <path clipRule="evenodd" d={svgPaths.p3e2ce480} fill="#FFC204" fillRule="evenodd" />
+                </svg> */}
+             </div>
+        <span className="text-3xl font-['Manrope:Medium',sans-serif] text-[32px] text-gray-900 dark:text-gray-100">
+          4Hacks
+        </span>
+
+      </div>
+
+          <div className="text-center">
+  <h2 className="text-3xl  text-black">
+    Welcome Back
+  </h2>
+
+  <p className="text-l text-gray-500 mt-1">
+    Sign in to continue your journey
+  </p>
+</div>
+
+          </div>
+          <div>
+         <div className="flex flex-col gap-2 w-full">
+
+ <Link
+  href="#"
+  onClick={(e) => {
+    e.preventDefault();
+     loginWithGoogle();
+  }}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="w-full flex items-center justify-center gap-3 py-3 px-6 rounded-xl 
+  bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+  hover:bg-gray-100 dark:hover:bg-gray-700 
+  text-gray-800 dark:text-gray-100 transition"
+>
+  <FcGoogle className="text-lg" />
+  <span className="text-sm">Continue with Google</span>
+</Link>
+
+      {/* GitHub Button */}
+   <Link
+  href="#"
+  onClick={(e) => {
+    e.preventDefault();
+    loginWithGithub();
+  }}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="w-full flex items-center justify-center gap-3 py-3 px-6 rounded-xl 
+  bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+  hover:bg-gray-100 dark:hover:bg-gray-700 
+  text-gray-800 dark:text-gray-100 transition"
+>
+  <FaGithub className="text-lg" />
+  <span className="text-sm">Continue with GitHub</span>
+</Link>
+<Link
+   href="#"
+  onClick={(e) => {
+    e.preventDefault();
+    loginWithLinkedin();
+  }}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="w-full flex items-center justify-center gap-3 py-3 px-6 rounded-xl 
+  bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+  hover:bg-gray-100 dark:hover:bg-gray-700 
+  text-gray-800 dark:text-gray-100 transition">
+  <FaLinkedinIn className="text-md" color="#0077B5"/>
+  <span className="text-sm">Continue with LinkedIn</span>
+</Link>
+
+</div>
+
+            <div className="relative py-1">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  <Mail className="mr-2 h-4 w-4" />
-                  Sign In
-                </Button>
-              </form>
-            </CardContent>
-            <CardFooter className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Don&apos;t have an account?{' '}
+              <div className="relative flex justify-center text-m">
+               <span className="p-2 text-gray-500 bg-white dark:bg-gray-900 transition-colors sm:px-5 sm:py-2">
+                  Or continue with email
+                </span>
+              </div>
+            </div>
+            {alert && (
+    <div className="mb-4">
+      <Alert
+        variant={alert.variant}
+        title={alert.title}
+        message={alert.message}
+      />
+    </div>
+  )}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div className="space-y-5">
+                  {/* Email */}
+          <div>
+            <Label>Email</Label>
+            <div className="relative">
+              <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white "/>
+             
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                className="pl-12"
+                error={!!errors.email}
+                {...register("email")}
+              />
+            </div>
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+                {/* Password */}
+          <div>
+            <Label>Password</Label>
+            <div className="relative">
+              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-300"/>
+
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                className="pl-12 pr-12"
+                error={!!errors.password}
+                {...register("password")}
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute z-30 right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+              >
+                {/* {showPassword ? (
+                  <EyeIcon className="fill-gray-500" />
+                ) : (
+                  <EyeCloseIcon className="fill-gray-500" />
+                )} */}
+              </span>
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+                 {/* Remember me + forgot password */}
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <Checkbox
+                {...register("rememberMe")}
+                checked={rememberValue}
+                onChange={(checked: boolean) =>
+                  setValue("rememberMe", checked)
+                }
+              />
+              <span className="text-sm text-gray-700">Keep me logged in</span>
+            </label>
+
+            <Link
+              href="/resetpassword"
+              className="text-sm text-yellow-500 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+                 <Button className="w-full" size="sm" onClick={handleSubmit(onSubmit)} >
+            Sign in
+          </Button>
+              </div>
+            </form>
+
+            <div className="mt-5">
+              <p className="text-l font-normal text-center text-gray-700 dark:text-gray-400 l:text-center">
+                Don&apos;t have an account? {""}
                 <Link
-                  href="/auth/signup"
-                  className="font-medium text-purple-600 hover:underline"
+                  href="/signup"
+                  className=" text-black hover:underline"
                 >
-                  Sign up
+                  Sign Up
                 </Link>
               </p>
-            </CardFooter>
-          </Card>
-        </div>
+            </div>
+          </div>
+        
       </div>
-    </>
-  )
+    </div>
+  );
 }
