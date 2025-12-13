@@ -1,5 +1,6 @@
 import { BASE_URL } from "@/src/api/config/apiConfig";
 
+
 export async function loginWithGithub() {
   try {
     const githubUrl = `${BASE_URL}/auth/github/login`;

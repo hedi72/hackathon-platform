@@ -1,6 +1,7 @@
 import { BASE_URL } from "@/src/api/config/apiConfig";
 
 
+
 export async function loginWithGoogle() {
   try {
     const googleUrl = `${BASE_URL}/auth/google/login`;
@@ -11,4 +12,3 @@ export async function loginWithGoogle() {
     console.error("❌ Google login error:", error);
   }
 }
-

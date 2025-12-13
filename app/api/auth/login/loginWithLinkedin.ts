@@ -1,5 +1,6 @@
 import { BASE_URL } from "@/src/api/config/apiConfig";
 
+
 export async function loginWithLinkedin() {
   try {
     const linkedinUrl = `${BASE_URL}/auth/linkedin/login`;

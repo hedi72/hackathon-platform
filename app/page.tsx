@@ -1,3 +1,8 @@
+"use client";
+
+
+
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,8 +15,40 @@ import ExploreCategories from '@/src/components/ui/home-components/ExploreCatego
 import CertificationSection from '@/src/components/ui/home-components/CertificationSection'
 import FAQSection from '@/src/components/ui/home-components/FAQSection'
 import JoinCommunitySection from '@/src/components/ui/home-components/JoinCommunitySection'
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useUser } from './context/UserContext';
+import { getCurrentUser } from './api/auth/getCurrentUser';
+import { useEffect } from 'react';
 
 export default function HomePage() {
+
+  const params = useSearchParams();
+  const router = useRouter();
+  const { setUser } = useUser();
+ useEffect(() => {
+    const token = params.get("token");
+
+    if (!token) return; // normal visit, nothing to do
+
+    console.log("✅ OAuth token detected on home page");
+
+    // 1️⃣ Store token
+    localStorage.setItem("token", token);
+
+    // 2️⃣ Clean URL (remove ?token=...)
+    router.replace("/");
+
+    // 3️⃣ Fetch user
+    getCurrentUser().then((user) => {
+      if (user) {
+        setUser(user);
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("name", user.username || "");
+      }
+    });
+  }, [params, router, setUser]);
+
+
   const features = [
     {
       icon: Calendar,

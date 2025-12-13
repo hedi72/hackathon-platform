@@ -24,33 +24,21 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  useEffect(() => {
-    const loadUser = async () => {
-      // const stored = localStorage.getItem("user");
+ useEffect(() => {
+  const loadUser = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-      // if (stored) {
-      //   try {
-      //     const parsed = JSON.parse(stored);
-      //     setUser(parsed);
-      //     console.log("🔄 Loaded user from localStorage:", parsed);
-      //     return;
-      //   } catch (e) {
-      //     console.error("Invalid user JSON in localStorage");
-      //   }
-      // }
+    const user = await getCurrentUser();
+    if (user) {
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+  };
 
-      // No stored user → fetch from API
-      const newUser = await getCurrentUser();
-      if (newUser) {
-        setUser(newUser);
-        console.log("🔄 Fetched user from API:", newUser);
-        // localStorage.setItem("user", JSON.stringify(newUser));
-        
-      }
-    };
+  loadUser();
+}, []);
 
-    loadUser();
-  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
