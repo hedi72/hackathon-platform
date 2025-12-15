@@ -111,9 +111,9 @@ export function Navbar() {
       });
      
       // Rafraîchir les notifications après acceptation
-      setTimeout(() => {
+      //setTimeout(() => {
         refresh();
-      }, 500);
+      //}, 500);
     } catch (error) {
       console.error('Failed to accept invite:', error);
     } finally {
@@ -140,9 +140,9 @@ export function Navbar() {
          await markAsRead(notificationId as string);
       });
       // Rafraîchir les notifications après refus
-      setTimeout(() => {
+      //setTimeout(() => {
         refresh();
-      }, 500);
+      //}, 500);
     } catch (error) {
       console.error('Failed to decline invite:', error);
     } finally {
