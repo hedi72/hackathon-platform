@@ -106,8 +106,10 @@ export function Navbar() {
     
     try {
       // Le hook attend hackathonId, teamId, invitationId (notificationId)
-      await acceptTeamInvite(hackathonId, teamId, teamInvitationId);
-      await markAsRead(notificationId as string);
+      await acceptTeamInvite(hackathonId, teamId, teamInvitationId).finally(async () => {
+         await markAsRead(notificationId as string);
+      });
+     
       // Rafraîchir les notifications après acceptation
       setTimeout(() => {
         refresh();
@@ -134,8 +136,9 @@ export function Navbar() {
     
     try {
       // Le hook attend hackathonId, teamId, invitationId (notificationId)
-      await declineTeamInvite(hackathonId, teamId, teamInvitationId);
-      await markAsRead(notificationId as string);
+      await declineTeamInvite(hackathonId, teamId, teamInvitationId).finally(async () => {
+         await markAsRead(notificationId as string);
+      });
       // Rafraîchir les notifications après refus
       setTimeout(() => {
         refresh();
