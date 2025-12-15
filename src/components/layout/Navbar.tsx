@@ -283,7 +283,7 @@ export function Navbar() {
             className="flex items-center space-x-3 transform hover:scale-105 transition-transform duration-300"
           >
             <div className="w-10 h-10 flex items-center justify-center">
-              <img src='/images/logo-small.png'/>
+              <img src={isMobile ? '/images/logo-small.png' : '/images/logo-lg.png'} style={isMobile ? {} : {width:'100px', height: '40px', marginLeft: '50px', marginTop: '10px', maxWidth: 'fit-content'}}/>
             </div>
             <span className="text-white text-xl font-extrabold tracking-wide">
               
@@ -470,7 +470,7 @@ export function Navbar() {
           {isMobile && (
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-white hover:bg-white/20 transition-colors duration-300"
+              className="p-2 rounded-lg bg-gray-500 text-white hover:bg-white/20 transition-colors duration-300"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -487,13 +487,13 @@ export function Navbar() {
               transition={{ duration: 0.3 }}
               className="mt-3 mb-4 bg-white/10 backdrop-blur-lg rounded-xl shadow-2xl border border-white/20 overflow-hidden"
             >
-              <div className="py-6 px-4 space-y-4">
+              <div className="py-6 px-4 space-y-4 bg-gray-200 text-black">
                 {navLinks.map((link) => (
                   <Link
                     key={link.name}
                     href={link.href}
                     onClick={closeMobileMenu}
-                    className="flex items-center gap-3 px-4 py-3 text-white font-medium rounded-lg hover:bg-white/20 transition-all duration-300 transform hover:translate-x-2"
+                    className="flex items-center gap-3 px-4 py-3 text-black font-medium rounded-lg hover:bg-white/20 transition-all duration-300 transform hover:translate-x-2"
                   >
                     <link.icon className="w-5 h-5" />
                     <span>{link.name}</span>
@@ -503,7 +503,7 @@ export function Navbar() {
                 {/* Mobile Notifications Section */}
                 {isAuthenticated && notifications.length > 0 && (
                   <div className="pt-4 mt-4 border-t border-white/30">
-                    <h4 className="px-4 py-2 text-white font-semibold mb-2">Notifications</h4>
+                    <h4 className="px-4 py-2 text-black font-semibold mb-2">Notifications</h4>
                     <div className="space-y-2 max-h-60 overflow-y-auto">
                       {notifications.slice(0, 5).map((notification) => {
                         const isProcessing = processingNotifications.has(notification.id);
@@ -519,10 +519,10 @@ export function Navbar() {
                             <div className="flex items-start gap-2">
                               {getNotificationIcon(notification.type)}
                               <div className="flex-1">
-                                <p className="text-sm font-medium text-white">
+                                <p className="text-sm font-medium text-black">
                                   {getNotificationTitle(notification.type)}
                                 </p>
-                                <p className="text-xs text-gray-200">{notification.content}</p>
+                                <p className="text-xs text-black">{notification.content}</p>
                                 {isTeamInvite && teamId && hackathonId && (
                                   <div className="mt-2 flex gap-2">
                                     <Button

@@ -1,14 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createSubmission } from "@/app/api/hackathon/submissions/createSubmission";
 import { useToken } from "@/app/context/TokenContext";
 import { useToast } from "@/hooks/use-toast";
 import { useAlert } from "../context/AlertProvider";
+import { Team } from "@/src/types/team";
+import { useParams } from "next/navigation";
+import { getTeams } from "@/src/api/hackathon/team";
+import { useAuth } from "@/src/hooks/useAuth";
 
-export default function SubmitBuidlModal({ hackathonId, onClose }) {
+export default function SubmitBuidlModal({ hackathonId, hackathon, onClose }) {
   const { token } = useToken();
   const [loading, setLoading] = useState(false);
   const { showAlert } = useAlert();
+  const { id } = useParams();
+
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const { user, isAuthenticated } = useAuth();
 
   const [submission, setSubmission] = useState({
     teamId: "",
@@ -27,46 +36,86 @@ export default function SubmitBuidlModal({ hackathonId, onClose }) {
 
   async function handleSubmit() {
     if (!token) return;
-          showAlert("warning", "Authentication required", "You must be logged in to submit a BUIDL.");
-
+    showAlert(
+      "warning",
+      "Authentication required",
+      "You must be logged in to submit a BUIDL."
+    );
 
     setLoading(true);
 
     try {
       const payload = {
         ...submission,
+        teamId: selectedTeam?.id,
         technologies: submission.technologies
           .split(",")
           .map((t) => t.trim())
           .filter(Boolean),
       };
 
-      const result = await createSubmission(hackathonId, token, payload);
+      const result = await createSubmission(hackathonId, payload);
 
-      
-          showAlert("success", "Submitted!","🎉  BUIDL submitted successfully!");
+      showAlert("success", "Submitted!", "🎉  BUIDL submitted successfully!");
 
       onClose();
     } catch (err) {
-            showAlert("warning", "❌ Submit failed", err.message || "Something went wrong. Please try again.");
-
+      showAlert(
+        "warning",
+        "❌ Submit failed",
+        err.message || "Something went wrong. Please try again."
+      );
     }
 
     setLoading(false);
   }
+  useEffect(() => {
+    if (!id || !user?.id) return;
 
-  function input(label, key, type = "text") {
+    const fetchTeams = async () => {
+      try {
+        const res = await getTeams(id as string, {
+          page: 1,
+          limit: 10,
+        });
+
+        setTeams(res.data);
+
+        const team = res.data.find((team) =>
+          team.members?.some((member) => member.user?.id === user.id)
+        );
+
+        console.log("User's team:", team);
+        setSelectedTeam(team ?? null);
+      } catch (err) {
+        console.error("Error loading teams:", err);
+      }
+    };
+
+    fetchTeams();
+  }, [id, user?.id]);
+
+  function input(
+    label,
+    key,
+    type = "text",
+    disabled = false,
+    defaultValue = ""
+  ) {
     return (
       <div className="flex flex-col gap-1">
         <label className="font-medium">{label}</label>
         <input
           type={type}
           className="border p-2 rounded w-full"
-          value={submission[key]}
+          value={disabled ? defaultValue : submission[key]}
           onChange={(e) =>
             setSubmission({ ...submission, [key]: e.target.value })
           }
-          placeholder={label}
+          placeholder={
+            disabled ? defaultValue : `Enter ${label.toLowerCase()}...`
+          }
+          disabled={disabled}
         />
       </div>
     );
@@ -84,9 +133,49 @@ export default function SubmitBuidlModal({ hackathonId, onClose }) {
         <h2 className="text-2xl font-bold mb-4">Submit Your BUIDL</h2>
 
         {/* ALL INPUTS */}
-        {input("Team ID", "teamId")}
-        {input("Track ID", "trackId")}
-        {input("Bounty ID", "bountyId")}
+        {input(
+          "Team",
+          selectedTeam?.id as string,
+          "text",
+          true,
+          selectedTeam?.name
+        )}
+        <div className="flex flex-col gap-1">
+          <label className="font-medium">Track</label>
+          <select
+            className="border p-2 rounded w-full"
+            value={submission.trackId}
+            onChange={(e) =>
+              setSubmission({ ...submission, trackId: e.target.value })
+            }
+          >
+            <option value="">Select a track</option>
+
+            {hackathon?.tracks?.map((track) => (
+              <option key={track.id} value={track.id}>
+                {track.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="font-medium">Bounty</label>
+          <select
+            className="border p-2 rounded w-full"
+            value={submission.bountyId}
+            onChange={(e) =>
+              setSubmission({ ...submission, bountyId: e.target.value })
+            }
+          >
+            <option value="">Select a Bounty</option>
+
+            {hackathon?.bounties?.map((bounty) => (
+              <option key={bounty.id} value={bounty.id}>
+                {bounty.name}
+              </option>
+            ))}
+          </select>
+        </div>
         {input("Title", "title")}
         {input("Tagline", "tagline")}
 

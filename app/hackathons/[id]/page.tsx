@@ -122,6 +122,7 @@ export default function HackathonDetails({ params }) {
 {showModal && (
   <SubmitBuidlModal
     hackathonId={hackathon?.id}
+    hackathon={hackathon}
     onClose={() => setShowModal(false)}
   />
 )}

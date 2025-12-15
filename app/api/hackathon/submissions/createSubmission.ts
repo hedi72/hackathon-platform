@@ -1,6 +1,9 @@
 import { BASE_URL } from "@/src/api/config/apiConfig";
+import { checkAndRefreshToken } from "../../auth/checkAndRefreshToken";
 
-export async function createSubmission(hackathonId, token, submissionData) {
+export async function createSubmission(hackathonId, submissionData) {
+    const token = await checkAndRefreshToken();
+  
   try {
     const res = await fetch(
       `${BASE_URL}/hackathon/${hackathonId}/submissions`,
