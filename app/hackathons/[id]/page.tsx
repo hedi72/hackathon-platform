@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import HackathonInfoCard from "@/app/views/HackathonInfoCard";
-import { getHackathonDetails, HackathonDetails } from "@/src/api/hackathon/hackathonDetails";
+import { getHackathonDetails } from "@/src/api/hackathon/hackathonDetails";
+import type { HackathonDetails } from "@/src/api/hackathon/hackathonDetails";
 import HackathonDetailsSection from "@/app/views/HackathonDetailsSection";
 import { useToken } from "@/app/context/TokenContext";
 import { registerToHackathon } from "@/app/api/hackathon/register";
@@ -10,6 +11,7 @@ import SubmitBuidlModal from "@/app/views/SubmitBuidlModal";
 import HackathonTabs from "../hackathon-tabs/HackathonTabs";
 import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/src/components/layout/Navbar";
+import { useAlert } from "@/app/context/AlertProvider";
 
 export default function HackathonDetails({ params }) {
   const [hackathon, setHackathon] = useState<HackathonDetails | null>(null);
@@ -17,7 +19,7 @@ export default function HackathonDetails({ params }) {
  const { token } = useToken();
   const [isRegistered, setIsRegistered] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const { toast } = useToast();
+  const { showAlert } = useAlert();
 
 
 
@@ -40,11 +42,8 @@ export default function HackathonDetails({ params }) {
 
   async function handleRegister() {
     if (!token) {
-      toast({
-  title: "❗ You must be logged in to register.",
-  description: "You are now registered as a hacker for this hackathon.",
-  variant: "destructive",
-});
+            showAlert("warning", "❗ You must be logged in to register.","You are now registered as a hacker for this hackathon.");
+
       
 
       return;
@@ -60,10 +59,8 @@ export default function HackathonDetails({ params }) {
         []       // registrationAnswers (future support)
       );
       setIsRegistered(true);
-           toast({
-  title: "🎉 You are now registered for this hackathon!",
-  description: "You are now registered as a hacker for this hackathon.",
-});
+                showAlert("success", "🎉 You are now registered for this hackathon!","You are now registered as a hacker for this hackathon.");
+
    
        const saved = localStorage.getItem("registered-" + params.id);
       if (saved === "true") {
@@ -75,11 +72,8 @@ export default function HackathonDetails({ params }) {
     } catch (error) {
       console.error("❌ Registration error:", error);
 
-               toast({
-  title: "Registration failed: " + error.message,
- variant: "destructive",
-});
-      
+          showAlert("warning", "Registration failed: ", error.message || "An error occurred during registration.");
+  
     
     }
   }

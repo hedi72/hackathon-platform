@@ -17,6 +17,7 @@ export interface HackathonDetails {
   categoryId: string | null;
   tags: string[];
   isRegistration?: any;
+  isRegistered?: any;
 }
 
 export async function getHackathonDetails(identifier: string,  token?: string): Promise<HackathonDetails> {

@@ -10,8 +10,8 @@ import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { Separator } from '../../../components/ui/separator';
 import { Github, Mail, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
 import Link from 'next/link';
+import { useAlert } from '@/app/context/AlertProvider';
 
 const images = [
   '/images/signin-art.png',
@@ -27,6 +27,8 @@ const SignupPage: React.FC = () => {
   const isGithubEnabled = process.env.NEXT_PUBLIC_GITHUB_ENABLED === 'true'
   
   const router = useRouter();
+  const { showAlert } = useAlert();
+
 
   // Désactiver le carousel avec une seule image
   useEffect(() => {
@@ -52,9 +54,9 @@ const SignupPage: React.FC = () => {
       const data = await res.json();
       
       if (!res.ok) {
-        toast.error(data.error || "Erreur lors de la création du compte.");
+        showAlert("warning", "Oops!", data.error || 'Erreur lors de la création du compte.');
       } else {
-        toast.success("Compte créé avec succès ! Connexion...");
+        showAlert("success", "Saved!","🎉 Compte créé avec succès ! Connexion...");
         
         // Connexion automatique après inscription
         const result = await signIn('credentials', {
@@ -64,15 +66,17 @@ const SignupPage: React.FC = () => {
         });
 
         if (result?.error) {
-          toast.error("Erreur lors de la connexion automatique. Veuillez vous connecter manuellement.");
+          showAlert("warning", "Oops!", "Erreur lors de la connexion automatique. Veuillez vous connecter manuellement.");
+
           router.replace('/auth/signin');
         } else {
-          toast.success("Bienvenue !");
+          showAlert("success", "","Bienvenue ! Vous êtes connecté.");
           router.replace('/dashboard');
         }
       }
     } catch (err) {
-      toast.error("Erreur réseau ou serveur. Veuillez réessayer.");
+                showAlert("warning", "Oops!", "Erreur réseau ou serveur. Veuillez réessayer.");
+
     } finally {
       setLoading(false);
     }
@@ -81,7 +85,8 @@ const SignupPage: React.FC = () => {
   const handleGithubSignUp = async () => {
     // Vérifier si GitHub est configuré
     if (!isGithubEnabled) {
-      toast.error('GitHub authentication is not configured. Please use email/password.')
+            showAlert("warning", "Oops!", 'GitHub authentication is not configured. Please use email/password.');
+
       return
     }
     
@@ -93,7 +98,8 @@ const SignupPage: React.FC = () => {
       });
     } catch (error) {
       console.error('GitHub signup error:', error)
-      toast.error('Failed to sign up with GitHub. Please try again.');
+            showAlert("warning", "Oops!", 'Failed to sign up with GitHub. Please try again.');
+
       setGithubLoading(false);
     }
   };

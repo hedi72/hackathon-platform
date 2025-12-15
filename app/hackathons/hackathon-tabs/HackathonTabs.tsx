@@ -1,5 +1,6 @@
 "use client";
 
+import { useAlert } from '@/app/context/AlertProvider';
 import { useToast } from '@/hooks/use-toast';
 import { inviteMemberToTeam } from '@/src/api/hackathon/inviteMemberToTeam';
 import { getTeams } from '@/src/api/hackathon/team';
@@ -18,7 +19,7 @@ export default function HackathonTabs() {
     const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
     const [isLoading, setIsLoading] = useState(false);
       const { user, isAuthenticated } = useAuth()
-       const { toast } = useToast()
+    const { showAlert } = useAlert();
 
 
     useEffect(() => {
@@ -50,11 +51,8 @@ export default function HackathonTabs() {
         e.preventDefault();
         
         if (!memberIdentifier.trim() || !selectedTeam || !id) {
-             toast({
-                title: 'Error',
-                description: 'Please enter an email or username',
-                variant: 'destructive'
-            })
+                  showAlert("warning", "Missing information", "Please enter an email or username");
+
             return;
         }
 
@@ -69,21 +67,12 @@ export default function HackathonTabs() {
             // Réinitialiser le formulaire
             setMemberIdentifier('');
             setShowInviteModal(false);
-            
-            // Afficher un message de succès
-             toast({
-                title: 'Success',
-                description: `Invitation sent to ${memberIdentifier} to join ${selectedTeam.name}`,
-                variant: 'default'
-            })
-            
+                      showAlert("success", "Invitation sent",`Invitation sent to ${memberIdentifier} to join ${selectedTeam.name}`);
+
         } catch (error: any) {
             console.error('Error sending invitation:', error);
-             toast({
-                title: 'Error',
-                description: error.message || 'Failed to send invitation. Please try again.',
-                variant: 'destructive'
-            })
+                  showAlert("warning", "Invitation not sent", error.message || 'Failed to send invitation. Please try again.');
+
         } finally {
             setIsLoading(false);
         }

@@ -3,11 +3,12 @@ import { useState } from "react";
 import { createSubmission } from "@/app/api/hackathon/submissions/createSubmission";
 import { useToken } from "@/app/context/TokenContext";
 import { useToast } from "@/hooks/use-toast";
+import { useAlert } from "../context/AlertProvider";
 
 export default function SubmitBuidlModal({ hackathonId, onClose }) {
   const { token } = useToken();
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const { showAlert } = useAlert();
 
   const [submission, setSubmission] = useState({
     teamId: "",
@@ -26,11 +27,8 @@ export default function SubmitBuidlModal({ hackathonId, onClose }) {
 
   async function handleSubmit() {
     if (!token) return;
-    toast({
-      title: "Authentication required",
-      description: "You must be logged in to submit a BUIDL.",
-      variant: "destructive",
-    });
+          showAlert("warning", "Authentication required", "You must be logged in to submit a BUIDL.");
+
 
     setLoading(true);
 
@@ -45,17 +43,13 @@ export default function SubmitBuidlModal({ hackathonId, onClose }) {
 
       const result = await createSubmission(hackathonId, token, payload);
 
-      toast({
-        title: "🎉  BUIDL submitted successfully!",
-      });
+      
+          showAlert("success", "Submitted!","🎉  BUIDL submitted successfully!");
 
       onClose();
     } catch (err) {
-      toast({
-        title: "❌ Submit failed",
-        description: err.message || "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
+            showAlert("warning", "❌ Submit failed", err.message || "Something went wrong. Please try again.");
+
     }
 
     setLoading(false);

@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import { TeamFormData } from '@/src/types/team';
 import TeamCreationForm from './TeamCreationForm';
 import { createTeam } from '@/src/api/hackathon/team';
+import { useAlert } from '@/app/context/AlertProvider';
 
 export default function CreateTeamPage() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function CreateTeamPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { id } = useParams();
-  const { toast } = useToast();
+  const { showAlert } = useAlert();
 
   const handleSubmit = async () => {
     if (!isFormValid) return;
@@ -26,19 +26,12 @@ export default function CreateTeamPage() {
       const result = await createTeam(id as string, formData);
       
       if (result.data) {
-        toast({
-          title: 'Success',
-          description: 'Team created successfully!',
-          variant: 'default'
-        });
+          showAlert("success", "Saved!","🎉 Team created successfully!");
+
         router.back();
       } 
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error?.message || 'Failed to create team. Please try again.',
-        variant: 'destructive'
-      });
+      showAlert("warning", "Oops!", error?.message || 'An error occurred while creating the team.');
     } finally {
       setIsSubmitting(false);
     }
