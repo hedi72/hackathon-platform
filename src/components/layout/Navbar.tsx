@@ -95,18 +95,19 @@ export function Navbar() {
     }`
   }
 
-  const handleAcceptInvite = async (notificationId: string, teamId?: string, hackathonId?: string) => {
+  const handleAcceptInvite = async (teamInvitationId: string, teamId?: string, hackathonId?: string, notificationId?: string) => {
     if (!teamId || !hackathonId) return;
     
     setProcessingNotifications(prev => {
       const newSet = new Set(prev);
-      newSet.add(notificationId);
+      newSet.add(teamInvitationId);
       return newSet;
     });
     
     try {
       // Le hook attend hackathonId, teamId, invitationId (notificationId)
-      await acceptTeamInvite(hackathonId, teamId, notificationId);
+      await acceptTeamInvite(hackathonId, teamId, teamInvitationId);
+      await markAsRead(notificationId as string);
       // Rafraîchir les notifications après acceptation
       setTimeout(() => {
         refresh();
@@ -116,24 +117,25 @@ export function Navbar() {
     } finally {
       setProcessingNotifications(prev => {
         const newSet = new Set(prev);
-        newSet.delete(notificationId);
+        newSet.delete(teamInvitationId);
         return newSet;
       });
     }
   };
 
-  const handleDeclineInvite = async (notificationId: string, teamId?: string, hackathonId?: string) => {
+  const handleDeclineInvite = async (teamInvitationId: string, teamId?: string, hackathonId?: string, notificationId?: string) => {
     if (!teamId || !hackathonId) return;
     
     setProcessingNotifications(prev => {
       const newSet = new Set(prev);
-      newSet.add(notificationId);
+      newSet.add(teamInvitationId);
       return newSet;
     });
     
     try {
       // Le hook attend hackathonId, teamId, invitationId (notificationId)
-      await declineTeamInvite(hackathonId, teamId, notificationId);
+      await declineTeamInvite(hackathonId, teamId, teamInvitationId);
+      await markAsRead(notificationId as string);
       // Rafraîchir les notifications après refus
       setTimeout(() => {
         refresh();
@@ -143,7 +145,7 @@ export function Navbar() {
     } finally {
       setProcessingNotifications(prev => {
         const newSet = new Set(prev);
-        newSet.delete(notificationId);
+        newSet.delete(teamInvitationId);
         return newSet;
       });
     }
@@ -186,6 +188,7 @@ export function Navbar() {
     // Extraire les IDs depuis le payload
     const teamId = notification.payload?.teamId;
     const hackathonId = notification.payload?.hackathonId;
+    const teamInvitationId = notification.payload?.teamInvitationId;
 
     return (
       <div className={cn(
@@ -212,14 +215,14 @@ export function Navbar() {
               )}
             </div>
             
-            {isTeamInvite && teamId && hackathonId && (
+            {isTeamInvite && teamId && hackathonId && teamInvitationId && !notification.isRead && (
               <div className="mt-3 flex gap-2">
                 <Button
                   size="sm"
                   className="bg-green-500 hover:bg-green-600 text-white"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleAcceptInvite(notification.id, teamId, hackathonId);
+                    handleAcceptInvite(teamInvitationId, teamId, hackathonId, notification.id);
                   }}
                   disabled={isProcessing}
                 >
@@ -236,7 +239,7 @@ export function Navbar() {
                   className="text-red-500 border-red-200 hover:bg-red-50"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDeclineInvite(notification.id, teamId, hackathonId);
+                    handleDeclineInvite(teamInvitationId, teamId, hackathonId, notification.id);
                   }}
                   disabled={isProcessing}
                 >

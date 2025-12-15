@@ -4,6 +4,7 @@ import { BASE_URL } from "../config/apiConfig";
 export interface NotificationPayload {
   teamId?: string;
   hackathonId?: string;
+  teamInvitationId?: string;
 }
 
 export type NotificationType = "TEAM_INVITE" | "TEAM_JOIN_REQUEST" | "MESSAGE" | "SYSTEM";
