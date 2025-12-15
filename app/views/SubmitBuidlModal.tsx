@@ -9,7 +9,6 @@ export default function SubmitBuidlModal({ hackathonId, onClose }) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-
   const [submission, setSubmission] = useState({
     teamId: "",
     trackId: "",
@@ -26,14 +25,12 @@ export default function SubmitBuidlModal({ hackathonId, onClose }) {
   });
 
   async function handleSubmit() {
-    if (!token) return 
-toast({
-  title: "Authentication required",
-  description: "You must be logged in to submit a BUIDL.",
-  variant: "destructive",
-});
-
-;
+    if (!token) return;
+    toast({
+      title: "Authentication required",
+      description: "You must be logged in to submit a BUIDL.",
+      variant: "destructive",
+    });
 
     setLoading(true);
 
@@ -49,17 +46,16 @@ toast({
       const result = await createSubmission(hackathonId, token, payload);
 
       toast({
-  title: "🎉  BUIDL submitted successfully!",
-});
+        title: "🎉  BUIDL submitted successfully!",
+      });
 
       onClose();
     } catch (err) {
       toast({
-      title: "❌ Submit failed",
-      description: err.message || "Something went wrong. Please try again.",
-      variant: "destructive",
-    });
-
+        title: "❌ Submit failed",
+        description: err.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
     }
 
     setLoading(false);
@@ -73,7 +69,9 @@ toast({
           type={type}
           className="border p-2 rounded w-full"
           value={submission[key]}
-          onChange={(e) => setSubmission({ ...submission, [key]: e.target.value })}
+          onChange={(e) =>
+            setSubmission({ ...submission, [key]: e.target.value })
+          }
           placeholder={label}
         />
       </div>
@@ -81,11 +79,14 @@ toast({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
-     onClick={onClose} >
-      <div className="bg-white rounded-2xl p-6 w-[600px] max-h-[90vh] overflow-y-auto space-y-4 shadow-lg"
-        onClick={(e) => e.stopPropagation()} >
-
+    <div
+      className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-6 w-[600px] max-h-[90vh] overflow-y-auto space-y-4 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 className="text-2xl font-bold mb-4">Submit Your BUIDL</h2>
 
         {/* ALL INPUTS */}
@@ -94,7 +95,7 @@ toast({
         {input("Bounty ID", "bountyId")}
         {input("Title", "title")}
         {input("Tagline", "tagline")}
-        
+
         <div className="flex flex-col gap-1">
           <label className="font-medium">Description</label>
           <textarea
@@ -143,7 +144,6 @@ toast({
             {loading ? "Submitting..." : "Submit BUIDL"}
           </button>
         </div>
-
       </div>
     </div>
   );
