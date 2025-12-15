@@ -2,10 +2,13 @@
 import { useState } from "react";
 import { createSubmission } from "@/app/api/hackathon/submissions/createSubmission";
 import { useToken } from "@/app/context/TokenContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SubmitBuidlModal({ hackathonId, onClose }) {
   const { token } = useToken();
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
 
   const [submission, setSubmission] = useState({
     teamId: "",
@@ -23,7 +26,14 @@ export default function SubmitBuidlModal({ hackathonId, onClose }) {
   });
 
   async function handleSubmit() {
-    if (!token) return alert("You must be logged in!");
+    if (!token) return 
+toast({
+  title: "Authentication required",
+  description: "You must be logged in to submit a BUIDL.",
+  variant: "destructive",
+});
+
+;
 
     setLoading(true);
 
@@ -38,10 +48,18 @@ export default function SubmitBuidlModal({ hackathonId, onClose }) {
 
       const result = await createSubmission(hackathonId, token, payload);
 
-      alert("🎉 BUIDL submitted successfully!");
+      toast({
+  title: "🎉  BUIDL submitted successfully!",
+});
+
       onClose();
     } catch (err) {
-      alert(err.message);
+      toast({
+      title: "❌ Submit failed",
+      description: err.message || "Something went wrong. Please try again.",
+      variant: "destructive",
+    });
+
     }
 
     setLoading(false);
@@ -63,8 +81,10 @@ export default function SubmitBuidlModal({ hackathonId, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-6 w-[600px] max-h-[90vh] overflow-y-auto space-y-4 shadow-lg">
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+     onClick={onClose} >
+      <div className="bg-white rounded-2xl p-6 w-[600px] max-h-[90vh] overflow-y-auto space-y-4 shadow-lg"
+        onClick={(e) => e.stopPropagation()} >
 
         <h2 className="text-2xl font-bold mb-4">Submit Your BUIDL</h2>
 

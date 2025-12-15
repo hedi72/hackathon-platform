@@ -8,12 +8,15 @@ import { useToken } from "@/app/context/TokenContext";
 import { registerToHackathon } from "@/app/api/hackathon/register";
 import SubmitBuidlModal from "@/app/views/SubmitBuidlModal";
 import HackathonTabs from "../hackathon-tabs/HackathonTabs";
+import { useToast } from "@/hooks/use-toast";
 
 export default function HackathonDetails({ params }) {
   const [hackathon, setHackathon] = useState(null);
   const { token } = useToken();
   const [isRegistered, setIsRegistered] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const { toast } = useToast();
+
 
 
  useEffect(() => {
@@ -32,8 +35,12 @@ export default function HackathonDetails({ params }) {
 
   async function handleRegister() {
     if (!token) {
-      alert("❗ You must be logged in to register.");
-      console.log("🔑 Token used for registration:", token);
+      toast({
+  title: "❗ You must be logged in to register.",
+  description: "You are now registered as a hacker for this hackathon.",
+  variant: "destructive",
+});
+      
 
       return;
     }
@@ -47,9 +54,11 @@ export default function HackathonDetails({ params }) {
         "",      // passCode — leave empty unless required
         []       // registrationAnswers (future support)
       );
-
-      console.log("🎉 Registration success:", response);
-      alert("🎉 You are now registered for this hackathon!");
+           toast({
+  title: "🎉 You are now registered for this hackathon!",
+  description: "You are now registered as a hacker for this hackathon.",
+});
+   
        const saved = localStorage.getItem("registered-" + params.id);
       if (saved === "true") {
     setIsRegistered(true);
@@ -59,7 +68,13 @@ export default function HackathonDetails({ params }) {
 
     } catch (error) {
       console.error("❌ Registration error:", error);
-      alert("Registration failed: " + error.message);
+
+               toast({
+  title: "Registration failed: " + error.message,
+ variant: "destructive",
+});
+      
+    
     }
   }
 
