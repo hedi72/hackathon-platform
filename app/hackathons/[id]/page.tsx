@@ -55,6 +55,7 @@ export default function HackathonDetails({ params }) {
         "",      // passCode — leave empty unless required
         []       // registrationAnswers (future support)
       );
+      setIsRegistered(true);
            toast({
   title: "🎉 You are now registered for this hackathon!",
   description: "You are now registered as a hacker for this hackathon.",
