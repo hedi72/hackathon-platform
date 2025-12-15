@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import HackathonInfoCard from "@/app/views/HackathonInfoCard";
-import { getHackathonDetails } from "@/src/api/hackathon/hackathonDetails";
+import { getHackathonDetails, HackathonDetails } from "@/src/api/hackathon/hackathonDetails";
 import HackathonDetailsSection from "@/app/views/HackathonDetailsSection";
 import { useToken } from "@/app/context/TokenContext";
 import { registerToHackathon } from "@/app/api/hackathon/register";
@@ -12,8 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/src/components/layout/Navbar";
 
 export default function HackathonDetails({ params }) {
-  const [hackathon, setHackathon] = useState(null);
-  const { token } = useToken();
+  const [hackathon, setHackathon] = useState<HackathonDetails | null>(null);
+
+ const { token } = useToken();
   const [isRegistered, setIsRegistered] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const { toast } = useToast();
@@ -23,16 +24,19 @@ export default function HackathonDetails({ params }) {
  useEffect(() => {
     console.log("🔥 Calling getHackathonDetails from Browser:", params.id);
 
-    getHackathonDetails(params.id)
+    getHackathonDetails(params.id, token || undefined)
       .then((data) => {
         console.log("🔥 Hackathon Data (browser):", data);
-        setHackathon(data);
+         setHackathon(data);
+
+      // ✅ THIS IS THE KEY PART
+      setIsRegistered(Boolean(data?.isRegistered));
       })
       .catch((error) => {
         console.error("❌ Error (browser):", error);
       });
 
-  }, [params.id]);
+  }, [params.id, token]);
 
   async function handleRegister() {
     if (!token) {
@@ -135,7 +139,7 @@ export default function HackathonDetails({ params }) {
               className={
                 isRegistered
                   ?  "px-5 py-2.5 rounded-lg bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "px-5 py-2.5 rounded-lg bg-[#FEC601] text-white hover:bg-gray-800"
+                : "px-5 py-2.5 rounded-lg bg-[#FEC601] text-white hover:bg-[#FEC601]"
               }
             >
               {isRegistered ? "Registered" : "Register as Hacker"}

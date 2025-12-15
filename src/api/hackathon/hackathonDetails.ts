@@ -16,16 +16,19 @@ export interface HackathonDetails {
   prizeToken: string;
   categoryId: string | null;
   tags: string[];
+  isRegistration?: any;
 }
 
-export async function getHackathonDetails(identifier: string): Promise<HackathonDetails> {
+export async function getHackathonDetails(identifier: string,  token?: string): Promise<HackathonDetails> {
   try {
     const url = `${BASE_URL}/hackathon/${identifier}`;
     console.log("Fetching Hackathon Details from URL:", url);
 
     const res = await fetch(url, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+       headers: token
+      ? { Authorization: `Bearer ${token}` }
+      : {},
       cache: "no-store",
     });
 
