@@ -21,27 +21,31 @@ export default function UpdatePositionModal({
 
   const [status, setStatus] = useState(position?.status || "OPEN");
 
-  async function handleUpdate() {
-    await updateTeamPosition(
-      hackathonId,
-      teamId,
-      position.id,
-      {
-        title,
-        description,
-        requiredSkills: skills
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-        status,
-      }
-    );
+async function handleUpdate() {
+  const res = await updateTeamPosition(
+    hackathonId,
+    teamId,
+    position.id,
+    {
+      title,
+      description,
+      requiredSkills: skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      status,
+    }
+  );
 
-    if (typeof onUpdated === "function") {
-      onUpdated(res.data); 
+  // ✅ SEND UPDATED POSITION BACK
+  if (typeof onUpdated === "function") {
+    onUpdated(res.data);
   }
-    onClose();
-  }
+
+  onClose();
+}
+
+
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
