@@ -7,10 +7,12 @@ import CreatePositionModal from "./CreatePositionModal";
 import UpdatePositionModal from "./UpdatePositionModal";
 import { applyToPosition } from "@/app/api/team/applyToPosition";
 import ApplyMessageModal from "./ApplyMessageModal";
+import { useAlert } from "@/app/context/AlertProvider";
 
 export default function TeamModal({ team, hackathonId, onClose }) {
   const { user } = useAuth();
   const leader = team.members.find((m) => m.isLeader)?.user;
+  const { showAlert } = useAlert();
 
   const [showCreatePosition, setShowCreatePosition] = useState(false);
   const [editingPosition, setEditingPosition] = useState(null);
@@ -167,10 +169,11 @@ export default function TeamModal({ team, hackathonId, onClose }) {
                 selectedPosition.id,
                 message
               );
-
-              alert("✅ Application sent");
+                showAlert("success","sent!", "🎉 Application sent");
+             
             } catch (e: any) {
-              alert(e.message || "Backend error");
+             
+               showAlert("warning","warning!", "Backend error");
             } finally {
               setApplyingId(null);
               setApplyModalOpen(false);
