@@ -26,12 +26,13 @@ export default function TeamModal({ team, hackathonId, onClose }) {
     try {
       setApplyingId(positionId);
 
-      await applyToPosition(
-        team.hackathonId,
-        team.id,
-        positionId,
-        "I am a great developer and I want to join the team"
-      );
+     await applyToPosition(
+  hackathonId,        // ✅ FIX — use the prop
+  team.id,
+  positionId,
+  "I am a great developer and I want to join the team"
+);
+
 
       alert("✅ Application sent successfully!");
     } catch (err: any) {
