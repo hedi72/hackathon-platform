@@ -1,6 +1,7 @@
 "use client";
 import { getCurrentUser } from "@/app/api/auth/getCurrentUser";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { checkAndRefreshToken } from "../api/auth/checkAndRefreshToken";
 
 export interface User {
   id: string;
@@ -26,7 +27,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
  useEffect(() => {
   const loadUser = async () => {
-    const token = localStorage.getItem("token");
+    const token = await checkAndRefreshToken();
     if (!token) return;
 
     const user = await getCurrentUser();
