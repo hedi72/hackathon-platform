@@ -15,7 +15,8 @@ export default function TeamModal({ team, hackathonId, onClose }) {
   const [editingPosition, setEditingPosition] = useState(null);
   const [applyingId, setApplyingId] = useState<string | null>(null);
 
-  const positions = team.teamPositions || [];
+ const [positions, setPositions] = useState(team.teamPositions || []);
+
 
   const isLeader = team.members.some(
     (m) => m.isLeader && m.user?.id === user?.id
@@ -102,7 +103,10 @@ export default function TeamModal({ team, hackathonId, onClose }) {
                   <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700">
                     {pos.status}
                   </span>
+
+                
                 </div>
+                
 
                 {/* ACTIONS */}
                 <div className="mt-5 flex items-center justify-between">
@@ -146,7 +150,7 @@ export default function TeamModal({ team, hackathonId, onClose }) {
         />
       )}
 
-     {editingPosition && (
+    {editingPosition && (
   <UpdatePositionModal
     hackathonId={hackathonId}
     teamId={team.id}
