@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import HackersList from "./HackersList";
 
 import { useToken } from "../context/TokenContext";
-import JoinTeamList from "./JoinTeamsList";
+import JoinTeamList from "./team/JoinTeamsList";
 import TracksList from "./TracksList";
 import InviteMemberToTeam from "./InviteMembertoTeam";
 import { Table } from "@/components/ui/table";
@@ -37,7 +37,7 @@ export default function HackathonDetailsSection({ hackathon }) {
                 : "pb-2"
             }
           >
-            BUIDLs
+            Submissions
           </button>
 
           <button

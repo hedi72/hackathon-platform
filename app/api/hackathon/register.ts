@@ -1,29 +1,38 @@
+import { checkAndRefreshToken } from "@/src/api/checkAndRefreshToken";
 import { BASE_URL } from "@/src/api/config/apiConfig";
 
 
-export async function registerToHackathon(hackathonId: string, token: string, passCode?: string, answers?: any[]) {
-  try {
-    const res = await fetch(`${BASE_URL}/hackathon/${hackathonId}/registration`, {
+export async function registerToHackathon(
+  hackathonId: string,
+  token: string,
+  passCode?: string,
+  answers?: {
+    questionId: string;
+    value: string[];
+  }[]
+) {
+  const body: any = {};
+
+  if (passCode) body.passCode = passCode;
+  if (answers && answers.length > 0) body.answers = answers;
+
+  const res = await fetch(
+    `${BASE_URL}/hackathon/${hackathonId}/registration`,
+    {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        passCode: passCode || "",
-        registrationAnswers: answers || []
-      })
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || `Registration failed (${res.status})`);
+      body: JSON.stringify(body),
     }
+  );
 
-    return await res.json();
-
-  } catch (error) {
-    console.error("❌ Registration error:", error);
-    throw error;
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Registration failed");
   }
+
+  return res.json();
 }
+

@@ -49,6 +49,17 @@ export default function HackathonDetails({ params }) {
       return;
     }
 
+    if (!hackathon) {
+    // 👈 HARD GUARD
+    showAlert(
+      "warning",
+      "Hackathon not loaded",
+      "Please wait a moment and try again."
+    );
+    return;
+  }
+
+
     try {
       console.log("➡️ Sending registration request...");
 
@@ -116,7 +127,7 @@ export default function HackathonDetails({ params }) {
   onClick={() => setShowModal(true)}
   className="px-5 py-2.5 rounded-lg bg-[#FCFAF7] hover:bg-gray-200 border border-[#18191F]"
 >
-  Submit BUIDL
+  Submit Your Project
 </button>
 
 {showModal && (

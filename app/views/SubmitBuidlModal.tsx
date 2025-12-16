@@ -224,7 +224,7 @@ export default function SubmitBuidlModal({ hackathonId, hackathon, onClose }) {
             disabled={loading}
             className="px-4 py-2 rounded bg-orange-500 text-white hover:bg-orange-600"
           >
-            {loading ? "Submitting..." : "Submit BUIDL"}
+            {loading ? "Submitting..." : "Submit YOUR PROJECT"}
           </button>
         </div>
       </div>

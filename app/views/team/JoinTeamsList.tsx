@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getHackathonTeams } from "../api/team/getTeams";
+import { getHackathonTeams } from "../../api/team/getTeams";
 import TeamModal from "./TeamModal";
 
 
@@ -39,7 +39,7 @@ export default function JoinTeamList({ hackathonId, token }) {
       </div>
 
       {selectedTeam && (
-        <TeamModal team={selectedTeam} onClose={() => setSelectedTeam(null)} />
+        <TeamModal team={selectedTeam}  hackathonId={hackathonId} onClose={() => setSelectedTeam(null)} />
       )}
     </div>
   );

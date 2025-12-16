@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getHackathonTeams } from "../api/team/getTeams";
-import TeamModal from "./TeamModal";
+import TeamModal from "./team/TeamModal";
 import { useParams, useRouter } from "next/navigation";
 import { Team } from "@/src/types/team";
 import { useAuth } from "@/src/hooks/useAuth";

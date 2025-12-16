@@ -5,6 +5,7 @@ import { useToken } from "@/app/context/TokenContext";
 import { FiUsers, FiMail } from "react-icons/fi";
 import { FaChevronRight } from "react-icons/fa";
 import { getHackathonRegistrations } from "../api/hackathon/getRegistrations";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function HackersList({ hackathonId }) {
   const { token } = useToken();
@@ -28,7 +29,6 @@ export default function HackersList({ hackathonId }) {
 
   return (
     <div className="w-full">
-
       {/* SEARCH BAR */}
       <div className="max-w-xl mb-6">
         <input
@@ -51,16 +51,19 @@ export default function HackersList({ hackathonId }) {
             >
               {/* CARD CONTENT */}
               <div className="flex items-center gap-4">
-                <img
-                  src={user.image || "/images/default-user.png"}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
+                <Avatar className="w-16 h-16">
+                  <AvatarImage
+                    src={user?.image || ""}
+                    alt={user?.name || "User"}
+                  />
+                  <AvatarFallback className="bg-orange-100 text-orange-700 font-bold">
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
 
                 <div>
                   <p className="font-bold text-lg">{user.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {user.username}
-                  </p>
+                  <p className="text-sm text-gray-500">{user.username}</p>
 
                   <span className="inline-block mt-1 text-xs px-3 py-1 bg-orange-100 text-orange-700 rounded-full">
                     BUIDL Submitted
