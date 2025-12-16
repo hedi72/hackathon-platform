@@ -1,15 +1,16 @@
-import { checkAndRefreshToken } from "@/src/api/checkAndRefreshToken";
 import { BASE_URL } from "@/src/api/config/apiConfig";
+import { checkAndRefreshToken } from "../auth/checkAndRefreshToken";
 
 
 export async function registerToHackathon(
   hackathonId: string,
   token: string,
-  passCode?: string,
+  
   answers?: {
     questionId: string;
     value: string[];
-  }[]
+  }[],
+  passCode?: string,
 ) {
   const body: any = {};
 

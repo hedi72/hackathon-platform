@@ -18,11 +18,12 @@ export default function SubmitBuidlModal({ hackathonId, hackathon, onClose }) {
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const { user, isAuthenticated } = useAuth();
+  const [submit, setSubmitted] = useState(false);
 
   const [submission, setSubmission] = useState({
     teamId: "",
-    trackId: "",
-    bountyId: "",
+    trackId: undefined,
+    bountyId: undefined,
     title: "",
     tagline: "",
     description: "",
@@ -57,6 +58,7 @@ export default function SubmitBuidlModal({ hackathonId, hackathon, onClose }) {
       const result = await createSubmission(hackathonId, payload);
 
       showAlert("success", "Submitted!", "🎉  BUIDL submitted successfully!");
+      setSubmitted(true);
 
       onClose();
     } catch (err) {
@@ -158,24 +160,6 @@ export default function SubmitBuidlModal({ hackathonId, hackathon, onClose }) {
             ))}
           </select>
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="font-medium">Bounty</label>
-          <select
-            className="border p-2 rounded w-full"
-            value={submission.bountyId}
-            onChange={(e) =>
-              setSubmission({ ...submission, bountyId: e.target.value })
-            }
-          >
-            <option value="">Select a Bounty</option>
-
-            {hackathon?.bounties?.map((bounty) => (
-              <option key={bounty.id} value={bounty.id}>
-                {bounty.name}
-              </option>
-            ))}
-          </select>
-        </div>
         {input("Title", "title")}
         {input("Tagline", "tagline")}
 
@@ -224,7 +208,7 @@ export default function SubmitBuidlModal({ hackathonId, hackathon, onClose }) {
             disabled={loading}
             className="px-4 py-2 rounded bg-orange-500 text-white hover:bg-orange-600"
           >
-            {loading ? "Submitting..." : "Submit YOUR PROJECT"}
+            {loading ? "Submitting..." : !submit ? "Submit YOUR PROJECT" : "Submitted!"}
           </button>
         </div>
       </div>

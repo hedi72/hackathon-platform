@@ -1,6 +1,8 @@
 import { BASE_URL } from "@/src/api/config/apiConfig";
+import { checkAndRefreshToken } from "../auth/checkAndRefreshToken";
 
-export async function getHackathonTeams(hackathonId: string, token: string) {
+export async function getHackathonTeams(hackathonId: string) {
+    const storedToken = await checkAndRefreshToken();
   try {
     const res = await fetch(
       `${BASE_URL}/hackathon/${hackathonId}/teams`,
@@ -8,7 +10,7 @@ export async function getHackathonTeams(hackathonId: string, token: string) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${storedToken}`,
         },
       }
     );

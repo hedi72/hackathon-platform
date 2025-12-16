@@ -1,3 +1,4 @@
+import { checkAndRefreshToken } from "../checkAndRefreshToken";
 import { BASE_URL } from "../config/apiConfig";
 
 export interface HackathonDetails {
@@ -18,17 +19,29 @@ export interface HackathonDetails {
   tags: string[];
   isRegistration?: any;
   isRegistered?: any;
+  registrationQuestions?: any;
+  organization?: {
+    id: string;
+    displayName: string;
+    logo: string | null;
+    website: string | null;
+  } | null;
+  registrationStart: string | null;
+  registrationEnd: string;
+  isPrivate: boolean;
+  invitePasscode: string | null;
 }
 
 export async function getHackathonDetails(identifier: string,  token?: string): Promise<HackathonDetails> {
+  const storedToken = await checkAndRefreshToken();
   try {
     const url = `${BASE_URL}/hackathon/${identifier}`;
     console.log("Fetching Hackathon Details from URL:", url);
 
     const res = await fetch(url, {
       method: "GET",
-       headers: token
-      ? { Authorization: `Bearer ${token}` }
+       headers: storedToken
+      ? { Authorization: `Bearer ${storedToken}` }
       : {},
       cache: "no-store",
     });
