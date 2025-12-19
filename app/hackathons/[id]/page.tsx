@@ -645,19 +645,31 @@ export default function HackathonDetails({ params }: { params: { id: string } })
   return (
     <main className="min-h-screen bg-[#f2f2f5] flex flex-col">
       <Navbar />
-      
-      {/* TOP SECTION WITH IMAGE + CARD */}
-      <div className="w-full px-10 mb-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-          <div className="lg:col-span-2 bg-white rounded-2xl overflow-hidden shadow-sm h-[620px]">
-            <img src="/images/signin-art5.png" className="w-full h-full object-cover" />
-          </div>
+   <div className="w-full px-10 mb-10 mt-8">
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
 
-          <div className="col-span-1 h-[620px]">
-            <HackathonInfoCard hackathon={hackathon} />
-          </div>
-        </div>
+    {/* LEFT IMAGE */}
+    <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm h-[560px] flex">
+      <div className="flex-1 flex items-center justify-center">
+        <img
+          src="/images/signin-art5.png"
+          className="max-h-[520px] w-auto object-contain"
+        />
       </div>
+    </div>
+
+    {/* RIGHT CARD */}
+    <div className="col-span-1 h-[620px] flex">
+      <div className="flex-1">
+        <HackathonInfoCard hackathon={hackathon} />
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
 
       {/* HEADER SECTION BELOW CARD */}
       <div className="w-full bg-white border-y border-gray-200">
